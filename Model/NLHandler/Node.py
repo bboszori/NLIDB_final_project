@@ -16,10 +16,9 @@ class Node:
     #SQL component
     component = None
 
-    def __init__(self, index, word, posTag, component=None):
+    def __init__(self, index=0, word=None, component=None):
         self.index = index
         self.word = word
-        self.posTag = posTag
         self.component = component
         self.parent = None
         self.children = list()
