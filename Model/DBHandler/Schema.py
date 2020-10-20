@@ -2,28 +2,19 @@ import Model.DBHandler.Exceptions
 
 class Schema:
 
-    def __init__(self, dbConn):
+    def __init__(self, dbConn, dbName):
 
         self._cursor = dbConn.cursor()
         self._tableDict = dict()
         self._rowDict = dict()
         self._keys = dict()
         self._connections= dict()
+        self._dbName = dbName
 
 
 
 
-        for table in Schema.tabledict:
-            cursor.execute("select column_name, data_type from information_schema.columns where (column_key = 'PRI') AND (table_name = '%s')" % (table))
-            primkeys = cursor.fetchall()
 
-            Schema.keys[table] = dict()
-            keylist = list()
-
-            for row in primkeys:
-                keylist.append(row[0])
-
-            Schema.keys[table] = keylist
 
         for table in Schema.tabledict:
             Schema.connections[table] = dict()
@@ -41,7 +32,7 @@ class Schema:
                 Schema.connections[table2].append(table1)
 
     def retrieveMSQLTableInfo(self):
-        self.cursor.execute("""SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_TYPE='BASE TABLE""")
+        self.cursor.execute("""SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE""" % (self.dbName))
         #self.cursor.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema='public'""")
         tablelist = self.cursor.fetchall()
 
@@ -64,7 +55,18 @@ class Schema:
             self.tabledict[item[0]] = columntype
             self.rowDict[item[0]] = columnvalues
 
+    def retrieveMSQLKeyInfo(self):
+        for table in self.tabledict:
+            self.cursor.execute("SELECT cu.COLUMN_NAME, cs.DATA_TYPE FROM %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as cu INNER JOIN %s.INFORMATION_SCHEMA.COLUMNS as cs ON cu.COLUMN_NAME=cs.COLUMN_NAME AND,cs.TABLE_NAME=cu.TABLE_NAME WHERE cs.TABLE_NAME LIKE '%s' AND CONSTRAINT_NAME LIKE 'PK%'" % (self.dbName, self.dbName, table))
+            primkeys = self.cursor.fetchall()
 
+            self.keys[table] = dict()
+            keylist = list()
+
+            for row in primkeys:
+                keylist.append(row[0])
+
+            self.keys[table] = keylist
 
     def getJoinPath(self, table1, table2):
         if not (table1 in Schema.tabledict) or not (table2 in Schema.tabledict):
