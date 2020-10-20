@@ -9,7 +9,7 @@ class SQLComponent:
     def __init__(self, type, value, score=1.0):
         self.type = type
         self.value = value
-        self.score = score
+        self.score = score #similarity
 
     def getType(self):
         return self.type
@@ -19,3 +19,4 @@ class SQLComponent:
 
     def getValue(self):
         return self.value
+

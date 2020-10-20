@@ -1,19 +1,12 @@
-# Az elemző fa nod-ja
+# Az elemző fa node-ja
 from Model.NLHandler import SQLComponent
 
 class Node:
     index = 0
-    # NL szó
+
     word = None
-
-    #A word-höz tartozó Part of Speech tag
-    posTag = None
-
-    #az elemző fában az adott node-hoz kapcsolódó szülő és gyermek node-ok
     parent = None
     children = list()
-
-    #SQL component
     component = None
 
     def __init__(self, index=0, word=None, component=None):
@@ -23,47 +16,53 @@ class Node:
         self.parent = None
         self.children = list()
 
+
+    def getText(self):
+        return self.word.text
+    def getTag(self):
+        return self.word.pos
+    def getChildren(self):
+        return self.children
+    def getComponent(self):
+        return self.component
+
+    #remove a child from the list
     def removeChild(self, child):
-        self.children = [childeNode for childeNode in self.children if childeNode != child]
+        self.children = [childNode for childNode in self.children if not childNode.equals(child)]
         return
 
-    def printNodeArray(self):
-        nodes = self.genNodesArray(self)
-        for node in nodes:
-            print("type: " + node.getInfo().getType() + " value: " + nodes.getInfo().getValue())
-
-    def genNodesArray(self):
-        nodesList = list()
+    def generateNodeList(self):
+        nodeList = list()
         stack = list()
         stack.insert(0, self)
 
         while len(stack) != 0:
-            curr = stack.pop(-len(stack))
-            nodesList.append(curr)
-            currChildren = curr.getChildren()
-            for i in range(len(currChildren) - 1, -1, -1):
-                stack.insert(0, currChildren[i])
+            current = stack.pop(-len(stack))
+            nodeList.append(current)
+            currentChildren = current.getChildren()
+            for i in range(len(currentChildren) - 1, -1, -1):
+                stack.insert(0, currentChildren[i])
 
         nodes = list()
-        for node in nodesList:
+        for node in nodeList:
             nodes.append(node)
 
         return nodes
 
-    def equals(self, obj):
-        if obj is None:
+    def equals(self, other):
+        if other is None:
             return False
-        if not (self.__class__ == obj.__class__):
+        if not (self.__class__ == other.__class__):
             return False
 
-        other = obj
+        other = other
         if not self.index == other.index:
             return False
 
-        if not self.word == other.word:
+        if not self.getText() == other.getText():
             return False
 
-        if not self.posTag == other.posTag:
+        if not self.getTag() == other.getTag():
             return False
 
         if self.children != other.children:
