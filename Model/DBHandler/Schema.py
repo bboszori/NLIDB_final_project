@@ -40,7 +40,7 @@ class Schema:
             if not table1 in Schema.connections[table2]:
                 Schema.connections[table2].append(table1)
 
-    def retrieveSchemaInfo(self):
+    def retrieveMSQLTableInfo(self):
         self.cursor.execute("""SELECT TABLE_NAME FROM information_schema.tables WHERE TABLE_TYPE='BASE TABLE""")
         #self.cursor.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema='public'""")
         tablelist = self.cursor.fetchall()
