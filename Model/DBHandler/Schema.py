@@ -167,4 +167,4 @@ class Schema:
         return columnList
 
     def getValues(self, tableName, columnName):
-        return self.rowDict[tableName][columnName]
+        return self._rowDict[tableName][columnName]
