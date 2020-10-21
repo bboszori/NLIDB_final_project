@@ -51,20 +51,20 @@ class Schema:
                         % self._dbName) + (
                     "ON cu.COLUMN_NAME=cs.COLUMN_NAME AND,cs.TABLE_NAME=cu.TABLE_NAME ") + (
                         "WHERE cs.TABLE_NAME = '%s' AND CONSTRAINT_NAME LIKE 'PK%s'" % (
-                    table, '%')))
+                                                table, '%')))
             primkeys = self._cursor.fetchall()
 
-            self.keys[table] = dict()
+            self._keys[table] = dict()
             keylist = list()
 
             for row in primkeys:
                 keylist.append(row[0])
 
-            self.keys[table] = keylist
+            self._keys[table] = keylist
 
     def retrieveMSQLConnections(self):
-        for table in self.tabledict:
-            self.connections[table] = dict()
+        for table in self._tableDict:
+            self._connections[table] = dict()
 
         self._cursor.execute(
             "SELECT FK.TABLE_NAME, CU.COLUMN_NAME, PK.TABLE_NAME, PT.COLUMN_NAME" + (
@@ -90,11 +90,12 @@ class Schema:
                 self._connections[table2].append(table1)
 
     def getJoinPath(self, table1, table2):
-        if not (table1 in Schema.tabledict) or not (table2 in Schema.tabledict):
+
+        if not (table1 in self._tableDict) or not (table2 in self._tableDict):
             return list()
 
         visited = dict()
-        for table in Schema.tabledict:
+        for table in self._tableDict:
             visited[table] = False
 
         prev = dict()
@@ -107,7 +108,7 @@ class Schema:
             tableCurr = queue[0]
             del queue[0]
 
-            for tableNext in Schema.connections[tableCurr]:
+            for tableNext in self._connections[tableCurr]:
                 if not visited[tableNext]:
                     visited[tableNext] = True
                     queue.append(tableNext)
