@@ -13,7 +13,6 @@ class Schema:
         self.retrieveMSQLKeyInfo()
         self.retrieveMSQLConnections()
 
-
     def retrieveMSQLTableInfo(self):
         self._cursor.execute(
             """SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE""" % self._dbName)
@@ -70,7 +69,6 @@ class Schema:
             self._tableDict[item[0]] = columntype
             self._rowDict[item[0]] = columnvalues
 
-
     def retrieveMSQLKeyInfo(self):
         for table in self._tableDict:
             self._cursor.execute(
@@ -82,7 +80,23 @@ class Schema:
                         % self._dbName) + (
                     "ON cu.COLUMN_NAME=cs.COLUMN_NAME AND,cs.TABLE_NAME=cu.TABLE_NAME ") + (
                         "WHERE cs.TABLE_NAME = '%s' AND CONSTRAINT_NAME LIKE 'PK%s'" % (
-                                                table, '%')))
+                    table, '%')))
+            primkeys = self._cursor.fetchall()
+
+            self._keys[table] = dict()
+            keylist = list()
+
+            for row in primkeys:
+                keylist.append(row[0])
+
+            self._keys[table] = keylist
+
+    def retrieveMySQLKeyInfo(self):
+        for table in self._tableDict:
+            self._cursor.execute(
+                "SELECT sc.COLUMN_NAME, cc.DATA_TYPE from information_schema.statistics as sc INNER JOIN INFORMATION_SCHEMA.COLUMNS as cc" + "ON sc.TABLE_NAME = cc.TABLE_NAME AND sc.COLUMN_NAME = cc.COLUMN_NAME" + (
+                            "where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'" % (
+                    self._dbName, table)))
             primkeys = self._cursor.fetchall()
 
             self._keys[table] = dict()
@@ -99,12 +113,12 @@ class Schema:
 
         self._cursor.execute(
             "SELECT FK.TABLE_NAME, CU.COLUMN_NAME, PK.TABLE_NAME, PT.COLUMN_NAME" + (
-                        "FROM %s.INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as C" % self._dbName) + (
-                        "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME" % self._dbName) + (
-                        "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME" % self._dbName) + (
-                        "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME" % self._dbName) + (
-                        "INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1" % self._dbName) + (
-                        "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME" % self._dbName) + (
+                    "FROM %s.INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as C" % self._dbName) + (
+                    "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME" % self._dbName) + (
+                    "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME" % self._dbName) + (
+                    "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME" % self._dbName) + (
+                    "INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1" % self._dbName) + (
+                    "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME" % self._dbName) + (
                 "WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME"))
         # self.cursor.execute("SELECT table_name, column_name, referenced_table_name,
         # referenced_column_name from information_schema.key_column_usage where referenced_table_name is not null" % (self._dbName, self.dbName, table))
