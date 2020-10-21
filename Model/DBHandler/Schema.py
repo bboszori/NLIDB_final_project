@@ -9,9 +9,16 @@ class Schema:
         self._connections = dict()
         self._dbName = dbname
 
-        self.retrieveMSQLTableInfo()
-        self.retrieveMSQLKeyInfo()
-        self.retrieveMSQLConnections()
+        if self._dbName == "mssql":
+            self.retrieveMSQLTableInfo()
+            self.retrieveMSQLKeyInfo()
+            self.retrieveMSQLConnections()
+        elif self._dbName == "mysql":
+            self.retrieveMySQLTableInfo()
+            self.retrieveMySQLKeyInfo()
+            self.retrieveMySQLConnections()
+        else:
+            raise AttributeError()
 
     def retrieveMSQLTableInfo(self):
         self._cursor.execute(
@@ -95,7 +102,7 @@ class Schema:
         for table in self._tableDict:
             self._cursor.execute(
                 "SELECT sc.COLUMN_NAME, cc.DATA_TYPE from information_schema.statistics as sc INNER JOIN INFORMATION_SCHEMA.COLUMNS as cc" + "ON sc.TABLE_NAME = cc.TABLE_NAME AND sc.COLUMN_NAME = cc.COLUMN_NAME" + (
-                            "where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'" % (
+                        "where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'" % (
                     self._dbName, table)))
             primkeys = self._cursor.fetchall()
 
@@ -122,6 +129,25 @@ class Schema:
                 "WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME"))
         # self.cursor.execute("SELECT table_name, column_name, referenced_table_name,
         # referenced_column_name from information_schema.key_column_usage where referenced_table_name is not null" % (self._dbName, self.dbName, table))
+
+        forkeys = self._cursor.fetchall()
+
+        for key in forkeys:
+            table1 = key[0]
+            table2 = key[2]
+
+            if table2 not in self._connections[table1]:
+                self._connections[table1].append(table2)
+            if table1 not in self._connections[table2]:
+                self._connections[table2].append(table1)
+
+    def retrieveMySQLConnections(self):
+        for table in self._tableDict:
+            self._connections[table] = dict()
+
+        self._cursor.execute(("SELECT table_name, column_name, referenced_table_name, referenced_column_name ") + (
+            "from information_schema.key_column_usage where referenced_table_name is not null") + (
+                                         "AND TABLE_SCHEMA = '%s'" % self._dbName))
 
         forkeys = self._cursor.fetchall()
 
