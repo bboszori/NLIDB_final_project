@@ -42,6 +42,35 @@ class Schema:
             self._tableDict[item[0]] = columntype
             self._rowDict[item[0]] = columnvalues
 
+    def retrieveMySQLTableInfo(self):
+        self._cursor.execute(
+            "SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '%s';" %
+            self._dbName)
+        tablelist = self._cursor.fetchall()
+
+        for item in tablelist:
+            self._tableDict[item[0]] = dict()
+            self._rowDict[item[0]] = dict()
+
+            self._cursor.execute(
+                "SELECT column_name, data_type from information_schema.columns where table_name = '%s'" % (
+                    item[0]))
+            columnlist = self._cursor.fetchall()
+            columntype = dict()
+            columnvalues = dict()
+
+            for column in columnlist:
+                columntype[column[0]] = column[1]
+                self._cursor.execute(
+                    "SELECT %s FROM %s.%s ORDER BY RAND() LIMIT 100" % (column[0], self._dbName,
+                                                                        item[0]))
+                row = self._cursor.fetchall()
+                columnvalues[column[0]] = row
+
+            self._tableDict[item[0]] = columntype
+            self._rowDict[item[0]] = columnvalues
+
+
     def retrieveMSQLKeyInfo(self):
         for table in self._tableDict:
             self._cursor.execute(
