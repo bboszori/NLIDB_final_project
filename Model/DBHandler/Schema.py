@@ -1,6 +1,3 @@
-import Model.DBHandler.Exceptions
-
-
 class Schema:
 
     def __init__(self, dbconn, dbname):
@@ -11,6 +8,11 @@ class Schema:
         self._keys = dict()
         self._connections = dict()
         self._dbName = dbname
+
+        self.retrieveMSQLTableInfo()
+        self.retrieveMSQLKeyInfo()
+        self.retrieveMSQLConnections()
+
 
     def retrieveMSQLTableInfo(self):
         self._cursor.execute(
@@ -135,7 +137,7 @@ class Schema:
         keys1ContainedIn2 = True
 
         for table1Key in table1Keys:
-            if not table1Key in self._tableDict[table2]:
+            if table1Key not in self._tableDict[table2]:
                 keys1ContainedIn2 = False
                 break
 
