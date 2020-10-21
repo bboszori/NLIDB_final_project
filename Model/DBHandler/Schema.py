@@ -161,7 +161,7 @@ class Schema:
     def getColumns(self, table):
         columnList = []
 
-        for column in self.tabledict[table]:
+        for column in self._tableDict[table]:
             columnList.append(column)
 
         return columnList
