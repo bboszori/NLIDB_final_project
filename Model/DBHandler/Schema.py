@@ -127,15 +127,15 @@ class Schema:
         return path
 
     def getJoinKeys(self, table1, table2):
-        table1Keys = Schema.keys[table1]
-        table2Keys = Schema.keys[table2]
+        table1Keys = self._keys[table1]
+        table2Keys = self._keys[table2]
 
         if table1Keys == table2Keys:
             return set()
         keys1ContainedIn2 = True
 
         for table1Key in table1Keys:
-            if not table1Key in Schema.tabledict[table2]:
+            if not table1Key in self._tableDict[table2]:
                 keys1ContainedIn2 = False
                 break
 
@@ -144,7 +144,7 @@ class Schema:
 
         keys2ContainedIn1 = True
         for table2Key in table2Keys:
-            if not table2Key in Schema.tabledict[table1]:
+            if table2Key not in self._tableDict[table1]:
                 keys2ContainedIn1 = False
                 break
 
