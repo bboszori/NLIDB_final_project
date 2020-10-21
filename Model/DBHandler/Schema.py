@@ -154,7 +154,7 @@ class Schema:
 
     def getTableNames(self):
         tableList = []
-        for tableName in self.tabledict:
+        for tableName in self._tableDict:
             tableList.append(tableName)
         return tableList
 
