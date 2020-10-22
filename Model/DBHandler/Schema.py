@@ -1,6 +1,6 @@
 class Schema:
 
-    def __init__(self, dbconn, dbname):
+    def __init__(self, dbconn, dbname, dbtype):
 
         self._cursor = dbconn.cursor()
         self._tableDict = dict()
@@ -9,11 +9,11 @@ class Schema:
         self._connections = dict()
         self._dbName = dbname
 
-        if self._dbName == "mssql":
+        if dbtype == "mssql":
             self.retrieveMSQLTableInfo()
             self.retrieveMSQLKeyInfo()
             self.retrieveMSQLConnections()
-        elif self._dbName == "mysql":
+        elif dbtype == "mysql":
             self.retrieveMySQLTableInfo()
             self.retrieveMySQLKeyInfo()
             self.retrieveMySQLConnections()
@@ -101,9 +101,10 @@ class Schema:
     def retrieveMySQLKeyInfo(self):
         for table in self._tableDict:
             self._cursor.execute(
-                "SELECT sc.COLUMN_NAME, cc.DATA_TYPE from information_schema.statistics as sc INNER JOIN INFORMATION_SCHEMA.COLUMNS as cc" + "ON sc.TABLE_NAME = cc.TABLE_NAME AND sc.COLUMN_NAME = cc.COLUMN_NAME" + (
-                        "where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'" % (
-                    self._dbName, table)))
+                "SELECT sc.COLUMN_NAME, cc.DATA_TYPE from information_schema.statistics as sc INNER JOIN "
+                "INFORMATION_SCHEMA.COLUMNS as cc ON sc.TABLE_NAME = cc.TABLE_NAME AND sc.COLUMN_NAME = "
+                "cc.COLUMN_NAME where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'"
+                % (self._dbName, table))
             primkeys = self._cursor.fetchall()
 
             self._keys[table] = dict()
@@ -127,8 +128,6 @@ class Schema:
                     "INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1" % self._dbName) + (
                     "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME" % self._dbName) + (
                 "WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME"))
-        # self.cursor.execute("SELECT table_name, column_name, referenced_table_name,
-        # referenced_column_name from information_schema.key_column_usage where referenced_table_name is not null" % (self._dbName, self.dbName, table))
 
         forkeys = self._cursor.fetchall()
 
@@ -143,11 +142,10 @@ class Schema:
 
     def retrieveMySQLConnections(self):
         for table in self._tableDict:
-            self._connections[table] = dict()
+            self._connections[table] = list()
 
-        self._cursor.execute(("SELECT table_name, column_name, referenced_table_name, referenced_column_name ") + (
-            "from information_schema.key_column_usage where referenced_table_name is not null") + (
-                                         "AND TABLE_SCHEMA = '%s'" % self._dbName))
+        self._cursor.execute("SELECT table_name, column_name, referenced_table_name, referenced_column_name from "
+                             "information_schema.key_column_usage where referenced_table_name is not null AND TABLE_SCHEMA = '%s'" % self._dbName)
 
         forkeys = self._cursor.fetchall()
 
