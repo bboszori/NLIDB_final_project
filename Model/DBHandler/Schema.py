@@ -22,7 +22,7 @@ class Schema:
 
     def retrieveMSQLTableInfo(self):
         self._cursor.execute(
-            """SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE""" % self._dbName)
+            "SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE'" % self._dbName)
         # self.cursor.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema='public'""")
         tablelist = self._cursor.fetchall()
 
@@ -119,15 +119,9 @@ class Schema:
         for table in self._tableDict:
             self._connections[table] = dict()
 
-        self._cursor.execute(
-            "SELECT FK.TABLE_NAME, CU.COLUMN_NAME, PK.TABLE_NAME, PT.COLUMN_NAME" + (
-                    "FROM %s.INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as C" % self._dbName) + (
-                    "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME" % self._dbName) + (
-                    "INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME" % self._dbName) + (
-                    "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME" % self._dbName) + (
-                    "INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1" % self._dbName) + (
-                    "INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME" % self._dbName) + (
-                "WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME"))
+        self._cursor.execute((
+                "SELECT FK.TABLE_NAME, CU.COLUMN_NAME, PK.TABLE_NAME, PT.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as C INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1 INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME" % (
+            self._dbName, self._dbName, self._dbName, self._dbName, self._dbName, self._dbName)))
 
         forkeys = self._cursor.fetchall()
 
