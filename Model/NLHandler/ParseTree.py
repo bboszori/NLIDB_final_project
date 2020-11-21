@@ -9,6 +9,8 @@ class ParseTree:
     indexOfLeftCoreNode = -1
 
     def __init__(self, question=None, parser=None):
+        self._root = None
+
         self.indexOfRightCoreNode = -1
         self.indexOfLeftCoreNode = -1
 
