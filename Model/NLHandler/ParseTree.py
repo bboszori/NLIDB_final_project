@@ -1,18 +1,11 @@
-from Model.NLHandler import Node
-from Model.NLHandler import Parser
+from Model.NLHandler.Node import Node
 
 class ParseTree:
-    mod = None
-    root = None
-    nodelist = list()
-    indexOfRightCoreNode = -1
-    indexOfLeftCoreNode = -1
-
-    def __init__(self, question=None, parser=None):
+    def __init__(self):
         self._root = None
+        self._indexOfRightCoreNode = -1
+        self._indexOfLeftCoreNode = -1
 
-        self.indexOfRightCoreNode = -1
-        self.indexOfLeftCoreNode = -1
 
 
 
