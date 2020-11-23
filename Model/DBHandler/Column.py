@@ -39,9 +39,12 @@ class Column:
     def get_samplevalues(self):
         return self.__samplevalues
 
+    def set_samplevalues(self, samples):
+        self.__samplevalues = samples
+
     def setasPrimarykey(self):
         self.__primary = True
 
-    def setasForeignkey(self, reftable, refcolumns):
+    def setasForeignkey(self, reftable, refcolumn):
         self.__foreign = True
-        self.__foreign_refs[reftable] = refcolumns
+        self.__foreign_refs[reftable] = refcolumn

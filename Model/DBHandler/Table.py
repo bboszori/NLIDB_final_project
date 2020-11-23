@@ -10,7 +10,7 @@ class Table:
             self.__columnlist = columns
 
     @property
-    def tablename(self):
+    def get_tablename(self):
         return self.__tablename
 
     @property
@@ -25,8 +25,14 @@ class Table:
             if column_name == column.getName:
                 return column
 
-    def add_column(self, column_name, column_type):
-        self.__columnlist.append(Column(column_name, column_type))
+    def contains_column(self, column_name):
+        for column in self.__columnlist:
+            if column_name == column.getName:
+                return True
+        return False
+
+    def add_column(self, column):
+        self.__columnlist.append(column)
 
     def get_primarykeys(self):
         primary_keys = []
@@ -47,7 +53,7 @@ class Table:
                 foreign_keys.append(column)
         return foreign_keys
 
-    def add_foreign_key(self, column_name, foreign_table, foreign_columns):
+    def add_foreign_key(self, column_name, foreign_table, foreign_column):
         for column in self.__columnlist:
             if column.getName == column_name:
-                column.setasForeignkey(foreign_table,foreign_columns)
+                column.setasForeignkey(foreign_table,foreign_column)

@@ -1,13 +1,16 @@
+from .Column import Column
+from .Table import Table
+
 class Schema:
 
     def __init__(self, dbconn, dbname, dbtype):
 
-        self._cursor = dbconn.cursor()
-        self._tableDict = dict()
-        self._rowDict = dict()
-        self._keys = dict()
-        self._connections = dict()
-        self._dbName = dbname
+        self.__cursor = dbconn.cursor()
+        self.__tables = []
+        self.__rowDict = dict()
+        self.__keys = dict()
+        self.__connections = dict()
+        self.__dbName = dbname
 
         if dbtype == "mssql":
             self.retrieveMSQLTableInfo()
@@ -21,157 +24,123 @@ class Schema:
             raise AttributeError()
 
     def retrieveMSQLTableInfo(self):
-        self._cursor.execute(
-            "SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE'" % self._dbName)
-        # self.cursor.execute("""SELECT table_name FROM information_schema.tables WHERE table_schema='public'""")
-        tablelist = self._cursor.fetchall()
+        self.__cursor.execute(
+            "SELECT TABLE_NAME FROM %s.information_schema.tables WHERE TABLE_TYPE='BASE TABLE'" % self.__dbName)
+        tablelist = self.__cursor.fetchall()
 
         for item in tablelist:
-            self._tableDict[item[0]] = dict()
-            self._rowDict[item[0]] = dict()
+            currTable = Table(item[0])
+            self.__tables.append(currTable)
 
-            self._cursor.execute(
+            self.__cursor.execute(
                 "SELECT column_name, data_type from information_schema.columns where table_name = '%s'" % (
                     item[0]))
-            columnlist = self._cursor.fetchall()
-            columntype = dict()
-            columnvalues = dict()
+            columnlist = self.__cursor.fetchall()
 
             for column in columnlist:
-                columntype[column[0]] = column[1]
-                self._cursor.execute(
+                currColumn = Column(column[0], column[1])
+                currTable.add_column(currColumn)
+                self.__cursor.execute(
                     "SELECT %s FROM %s ORDER BY TABLESAMPLE(10 PERCENT)" % (column[0], item[0]))
                 # cursor.execute("SELECT %s FROM %s ORDER BY RAND() LIMIT 100" % (column[0], item[0]))
-                row = self._cursor.fetchall()
-                columnvalues[column[0]] = row
-
-            self._tableDict[item[0]] = columntype
-            self._rowDict[item[0]] = columnvalues
+                row = self.__cursor.fetchall()
+                currColumn.set_samplevalues(row)
 
     def retrieveMySQLTableInfo(self):
-        self._cursor.execute(
+        self.__cursor.execute(
             "SELECT TABLE_NAME FROM information_schema.tables where TABLE_SCHEMA = '%s';" %
-            self._dbName)
-        tablelist = self._cursor.fetchall()
+            self.__dbName)
+        tablelist = self.__cursor.fetchall()
 
         for item in tablelist:
-            self._tableDict[item[0]] = dict()
-            self._rowDict[item[0]] = dict()
+            currTable = Table(item[0])
+            self.__tables.append(currTable)
 
-            self._cursor.execute(
+            self.__cursor.execute(
                 "SELECT column_name, data_type from information_schema.columns where table_name = '%s'" % (
                     item[0]))
-            columnlist = self._cursor.fetchall()
-            columntype = dict()
-            columnvalues = dict()
+            columnlist = self.__cursor.fetchall()
 
             for column in columnlist:
-                columntype[column[0]] = column[1]
-                self._cursor.execute(
-                    "SELECT %s FROM %s.%s ORDER BY RAND() LIMIT 100" % (column[0], self._dbName,
+                currColumn = Column(column[0],column[1])
+                currTable.add_column(currColumn)
+                self.__cursor.execute(
+                    "SELECT %s FROM %s.%s ORDER BY RAND() LIMIT 100" % (column[0], self.__dbName,
                                                                         item[0]))
-                row = self._cursor.fetchall()
-                columnvalues[column[0]] = row
-
-            self._tableDict[item[0]] = columntype
-            self._rowDict[item[0]] = columnvalues
+                row = self.__cursor.fetchall()
+                currColumn.set_samplevalues(row)
 
     def retrieveMSQLKeyInfo(self):
-        for table in self._tableDict:
-            self._cursor.execute(
+        for table in self.__tables:
+            self.__cursor.execute(
                 "SELECT cu.COLUMN_NAME, cs.DATA_TYPE " + ("FROM %s "
                                                           ".INFORMATION_SCHEMA.KEY_COLUMN_USAGE "
-                                                          "as cu " % self._dbName) + (
+                                                          "as cu " % self.__dbName) + (
                         "INNER JOIN %s "
                         ".INFORMATION_SCHEMA.COLUMNS as cs "
-                        % self._dbName) + (
+                        % self.__dbName) + (
                     "ON cu.COLUMN_NAME=cs.COLUMN_NAME AND,cs.TABLE_NAME=cu.TABLE_NAME ") + (
                         "WHERE cs.TABLE_NAME = '%s' AND CONSTRAINT_NAME LIKE 'PK%s'" % (
                     table, '%')))
-            primkeys = self._cursor.fetchall()
+            primkeys = self.__cursor.fetchall()
 
-            self._keys[table] = dict()
-            keylist = list()
-
-            for row in primkeys:
-                keylist.append(row[0])
-
-            self._keys[table] = keylist
+            for item in primkeys:
+                table.get_column(item[0]).setasPrimarykey()
 
     def retrieveMySQLKeyInfo(self):
-        for table in self._tableDict:
-            self._cursor.execute(
+        for table in self.__tables:
+            self.__cursor.execute(
                 "SELECT sc.COLUMN_NAME, cc.DATA_TYPE from information_schema.statistics as sc INNER JOIN "
                 "INFORMATION_SCHEMA.COLUMNS as cc ON sc.TABLE_NAME = cc.TABLE_NAME AND sc.COLUMN_NAME = "
                 "cc.COLUMN_NAME where sc.TABLE_SCHEMA = '%s' AND sc.INDEX_NAME = 'PRIMARY' AND sc.TABLE_NAME = '%s'"
-                % (self._dbName, table))
-            primkeys = self._cursor.fetchall()
+                % (self.__dbName, table.get_tablename))
+            primkeys = self.__cursor.fetchall()
 
-            self._keys[table] = dict()
-            keylist = list()
-
-            for row in primkeys:
-                keylist.append(row[0])
-
-            self._keys[table] = keylist
+            for item in primkeys:
+                table.get_column(item[0]).setasPrimarykey()
 
     def retrieveMSQLConnections(self):
-        for table in self._tableDict:
-            self._connections[table] = dict()
-
-        self._cursor.execute((
+        self.__cursor.execute((
                 "SELECT FK.TABLE_NAME, CU.COLUMN_NAME, PK.TABLE_NAME, PT.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS as C INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME INNER JOIN %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME INNER JOIN ( SELECT i1.TABLE_NAME, i2.COLUMN_NAME FROM %s.INFORMATION_SCHEMA.TABLE_CONSTRAINTS as i1 INNER JOIN %s.INFORMATION_SCHEMA.KEY_COLUMN_USAGE as i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY') as PT ON PT.TABLE_NAME = PK.TABLE_NAME" % (
-            self._dbName, self._dbName, self._dbName, self._dbName, self._dbName, self._dbName)))
+            self.__dbName, self.__dbName, self.__dbName, self.__dbName, self.__dbName, self.__dbName)))
 
-        forkeys = self._cursor.fetchall()
+        forkeys = self.__cursor.fetchall()
 
-        for key in forkeys:
-            table1 = key[0]
-            table2 = key[2]
-
-            if table2 not in self._connections[table1]:
-                self._connections[table1].append(table2)
-            if table1 not in self._connections[table2]:
-                self._connections[table2].append(table1)
+        for item in forkeys:
+            currtable = self.gettablebyname(item[0])
+            currtable.get_column(item[1]).add_foreign_key(item[2], item[3])
 
     def retrieveMySQLConnections(self):
-        for table in self._tableDict:
-            self._connections[table] = list()
+        self.__cursor.execute("SELECT table_name, column_name, referenced_table_name, referenced_column_name from "
+                             "information_schema.key_column_usage where referenced_table_name is not null AND "
+                              "TABLE_SCHEMA = '%s'" % self.__dbName)
 
-        self._cursor.execute("SELECT table_name, column_name, referenced_table_name, referenced_column_name from "
-                             "information_schema.key_column_usage where referenced_table_name is not null AND TABLE_SCHEMA = '%s'" % self._dbName)
+        forkeys = self.__cursor.fetchall()
 
-        forkeys = self._cursor.fetchall()
-
-        for key in forkeys:
-            table1 = key[0]
-            table2 = key[2]
-
-            if table2 not in self._connections[table1]:
-                self._connections[table1].append(table2)
-            if table1 not in self._connections[table2]:
-                self._connections[table2].append(table1)
+        for item in forkeys:
+            currtable = self.gettablebyname(item[0])
+            currtable.get_column(item[1]).add_foreign_key(item[2], item[3])
 
     def getJoinPath(self, table1, table2):
 
-        if not (table1 in self._tableDict) or not (table2 in self._tableDict):
+        if not (table1 in self.__tables) or not (table2 in self.__tables):
             return list()
 
         visited = dict()
-        for table in self._tableDict:
-            visited[table] = False
+        for table in self.__tables:
+            visited[table.get_tablename()] = False
 
         prev = dict()
         queue = list()
         queue.append(table1)
-        visited[table1] = True
+        visited[table1.get_tablename()] = True
         found = False
 
         while len(queue) != 0 and not found:
             tableCurr = queue[0]
             del queue[0]
 
-            for tableNext in self._connections[tableCurr]:
+            for tableNext in self.__connections[tableCurr]:
                 if not visited[tableNext]:
                     visited[tableNext] = True
                     queue.append(tableNext)
@@ -190,15 +159,15 @@ class Schema:
         return path
 
     def getJoinKeys(self, table1, table2):
-        table1Keys = self._keys[table1]
-        table2Keys = self._keys[table2]
+        table1Keys = table1.get_primarykeys()
+        table2Keys = table2.get_primarykeys()
 
         if table1Keys == table2Keys:
             return set()
         keys1ContainedIn2 = True
 
         for table1Key in table1Keys:
-            if table1Key not in self._tableDict[table2]:
+            if not table2.contains_column(table1Key.getName()):
                 keys1ContainedIn2 = False
                 break
 
@@ -207,7 +176,7 @@ class Schema:
 
         keys2ContainedIn1 = True
         for table2Key in table2Keys:
-            if table2Key not in self._tableDict[table1]:
+            if not table1.contains_column(table2Key.getName()):
                 keys2ContainedIn1 = False
                 break
 
@@ -217,17 +186,11 @@ class Schema:
 
     def getTableNames(self):
         tableList = []
-        for tableName in self._tableDict:
-            tableList.append(tableName)
+        for table in self.__tables:
+            tableList.append(table.get_tablename())
         return tableList
 
-    def getColumns(self, table):
-        columnList = []
-
-        for column in self._tableDict[table]:
-            columnList.append(column)
-
-        return columnList
-
-    def getValues(self, tableName, columnName):
-        return self._rowDict[tableName][columnName]
+    def gettablebyname(self, tname):
+        for i in self.__tables:
+            if i.get_tablename() == tname:
+                return i
