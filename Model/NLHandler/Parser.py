@@ -1,7 +1,7 @@
 import spacy
-from Model.NLHandler import ParseTree
-from Model.NLHandler import Node
-from Model.NLHandler import Word
+from .ParseTree import ParseTree
+from .ParseTree import ParseTree
+
 from spacy import displacy
 
 class Parser:
