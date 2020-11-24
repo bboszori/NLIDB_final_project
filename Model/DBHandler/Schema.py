@@ -184,6 +184,9 @@ class Schema:
             return set(table2Keys)
         return set()
 
+    def getTablelist(self):
+        return self.__tables
+
     def getTableNames(self):
         tableList = []
         for table in self.__tables:
