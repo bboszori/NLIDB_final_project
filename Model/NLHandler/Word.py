@@ -1,19 +1,27 @@
 
 class Word:
-    text = None
-    pos = None
-    tag = None
-    lemma = None
-    dep = None
-    ent = None
 
-    def _init_(self, text, pos, tag, lemma, dep, ent=None):
-        self.text = text
-        self.pos = pos
-        self.tag = tag
-        self.lemma = lemma
-        self.dep = dep
-        self.ent = ent
+    def _init_(self, token):
+        self.__token = token
+
+    @property
+    def get_token(self):
+        return self.__token
+
+    def get_text(self):
+        return self.__token.text
+
+    def get_pos(self):
+        return self.__token.pos_
+
+    def get_tag(self):
+        return self.__token.tag_
+
+    def get_lemma(self):
+        return self.__token.lemma_
+
+    
+
 
 
 
