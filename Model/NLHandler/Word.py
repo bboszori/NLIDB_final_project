@@ -20,7 +20,7 @@ class Word:
     def get_lemma(self):
         return self.__token.lemma_
 
-    
+
 
 
 

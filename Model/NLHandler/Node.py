@@ -1,34 +1,40 @@
 class Node:
     def __init__(self, type,  index=0, word=None, component=None):
-        self._index = index
-        self._word = word
-        self._type = type
-        self._component = component
-        self._parent = None
-        self._children = list()
+        self.__index = index
+        self.__word = word
+        self.__type = type
+        self.__component = component
+        self.__parent = None
+        self.__children = list()
 
     @property
     def getIndex(self):
-        return self._index
+        return self.__index
 
     @property
     def getWord(self):
-        return self._word
+        return self.__word
 
     @property
     def getType(self):
-        return self._type
+        return self.__type
+
+    def getText(self):
+        return self.__word.get_text()
 
     @property
     def getComponent(self):
-        return self._component
+        return self.__component
+
+    def setComponent(self, component):
+        self.__component = component
 
     @property
     def getParent(self):
-        return self._parent
+        return self.__parent
 
     @property
     def getChildren(self):
-        return self._children
+        return self.__children
 
 
