@@ -1,7 +1,6 @@
-
 class Word:
 
-    def _init_(self, token):
+    def __init__(self, token):
         self.__token = token
 
     @property

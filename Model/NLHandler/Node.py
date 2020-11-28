@@ -1,11 +1,10 @@
 class Node:
-    def __init__(self, type,  index=0, word=None, component=None):
+    def __init__(self, index=0, word=None, component=None):
         self.__index = index
         self.__word = word
-        self.__type = type
         self.__component = component
         self.__parent = None
-        self.__children = list()
+        self.__children = None
 
     @property
     def getIndex(self):
@@ -14,10 +13,6 @@ class Node:
     @property
     def getWord(self):
         return self.__word
-
-    @property
-    def getType(self):
-        return self.__type
 
     def getText(self):
         return self.__word.get_text()
@@ -33,8 +28,12 @@ class Node:
     def getParent(self):
         return self.__parent
 
+    def setParent(self, node):
+        self.__parent = node
+
     @property
     def getChildren(self):
         return self.__children
 
-
+    def setChildren(self, nodelist):
+        self.__children = nodelist
