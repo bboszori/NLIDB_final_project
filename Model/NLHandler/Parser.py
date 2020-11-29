@@ -10,8 +10,9 @@ from operator import attrgetter
 from spacy import displacy
 
 class Parser:
-    def __init__(self):
+    def __init__(self, schema):
         self.nlp = spacy.load('en_core_web_sm')
+        self.__schema = schema
         self.__components = dict()
 
         f = open("keywords.csv", "r")
@@ -73,7 +74,7 @@ class Parser:
     def similarityToken(self, token, text):
         return token.similarity(self.nlp(text))
 
-    def getComponentoptions(self, node, schema):
+    def getComponentoptions(self, node):
         result = set()
 
         if node.getWord() == "ROOT":
@@ -87,7 +88,7 @@ class Parser:
             result.add(self.__components[word])
             return list(result)
 
-        for table in schema.getTablelist():
+        for table in self.__schema.getTablelist():
             result.add(SQLComponent("NN", table.get_tablename, self.similarityToken(word, table.get_tablename)))
 
             for column in table.get_columnlist:
