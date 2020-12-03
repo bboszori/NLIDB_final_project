@@ -6,8 +6,8 @@ from Model.NLHandler.Word import Word
 from Model.DBHandler.Schema import Schema
 from Model.NLHandler.SQLComponent import SQLComponent
 from operator import attrgetter
-
-from spacy import displacy
+import string
+import re
 
 class Parser:
     def __init__(self, schema):
@@ -33,14 +33,15 @@ class Parser:
 
     def createParsetree(self, question):
         pt = ParseTree()
-        userquestion = self.nlp(question)
+
+        text = question
+        text = text.translate(str.maketrans('', '', string.punctuation))
+        text = " ".join(re.split("\s+", text, flags=re.UNICODE))
+        userquestion = self.nlp(text)
+
         sentence = list(userquestion.sents)
         root = sentence[0].root
         rootnode = Node(word=Word(root))
-        l = []
-        for ch in root.children:
-            l.append(Node(word=Word(ch)))
-        rootnode.setChildren(l)
         pt.set_root(rootnode)
 
         children = Queue()
@@ -48,19 +49,17 @@ class Parser:
         for child in root.children:
             n = Node(word=Word(child))
             n.setParent(rootnode)
-            n.setChildren(list(child.children))
+            rootnode.addChild(n)
             pt.addnode(n)
             children.put(child)
 
         while not children.empty():
             currchild = children.get()
+            currnode = pt.findNodebyToken(currchild)
             for child in currchild.children:
                 n = Node(word=Word(child))
-                n.setParent(currchild)
-                l = []
-                for ch in child.children:
-                    l.append(Node(word=Word(ch)))
-                n.setChildren(l)
+                n.setParent(currnode)
+                currnode.addChild(n)
                 pt.addnode(n)
                 children.put(child)
 
@@ -77,31 +76,33 @@ class Parser:
     def getComponentoptions(self, node):
         result = set()
 
-        if node.getWord() == "ROOT":
-            result.add(SQLComponent("ROOT", "ROOT"))
-            return list(result)
+        # if node.getWord() == "ROOT":
+        #     result.add(SQLComponent("ROOT", "ROOT"))
+        #     return list(result)
 
         valueNodes = set()
-        word = node.getWord().lower()
+        word = node.getWord.get_text().lower()
 
         if word in self.__components:
             result.add(self.__components[word])
             return list(result)
 
         for table in self.__schema.getTablelist():
-            result.add(SQLComponent("NN", table.get_tablename, self.similarityToken(word, table.get_tablename)))
+            result.add(SQLComponent("NN", table.get_tablename, self.similarityText(word, table.get_tablename)))
 
             for column in table.get_columnlist:
-                result.add(SQLComponent("NN", table.get_tablename + "." + column.getName, self.similarityToken(word, column.getName)))
+                result.add(SQLComponent("NN", table.get_tablename + "." + column.getName, self.similarityText(word,
+                                                                                                            column.getName)))
 
                 for value in column.get_samplevalues:
-                    valueNodes.add(SQLComponent("VN", table.get_tablename + "." + column.getName, self.similarityToken(
-                        word, value)))
+                    if value[0] != None:
+                        valueNodes.add(SQLComponent("VN", table.get_tablename + "." + column.getName, self.similarityText(
+                            word, str(value[0]))))
 
         for nodeInfo in valueNodes:
             result.add(nodeInfo)
 
-        sortedResultList = sorted(result, key=attrgetter('score'), reverse=True)
+        sortedResultList = sorted(result, key=attrgetter('similarity'), reverse=True)
 
         return sortedResultList
 

@@ -65,7 +65,7 @@ class Schema:
                 currColumn = Column(column[0],column[1])
                 currTable.add_column(currColumn)
                 self.__cursor.execute(
-                    "SELECT %s FROM %s.%s ORDER BY RAND() LIMIT 100" % (column[0], self.__dbName,
+                    "SELECT %s FROM %s.%s ORDER BY RAND() LIMIT 10" % (column[0], self.__dbName,
                                                                         item[0]))
                 row = self.__cursor.fetchall()
                 currColumn.set_samplevalues(row)
@@ -119,7 +119,7 @@ class Schema:
 
         for item in forkeys:
             currtable = self.gettablebyname(item[0])
-            currtable.get_column(item[1]).add_foreign_key(item[2], item[3])
+            currtable.add_foreign_key(item[1], item[2], item[3])
 
     def getJoinPath(self, table1, table2):
 
@@ -195,5 +195,5 @@ class Schema:
 
     def gettablebyname(self, tname):
         for i in self.__tables:
-            if i.get_tablename() == tname:
+            if i.get_tablename == tname:
                 return i

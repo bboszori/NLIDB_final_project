@@ -2,7 +2,7 @@ class SQLComponent:
     def __init__(self, type: str, component: str, similarity = 1.0):
         self.__type = type
         self.__component = component
-        self.__similarity = similarity
+        self.similarity = similarity
 
     @property
     def get_type(self):

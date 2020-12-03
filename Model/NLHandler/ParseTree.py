@@ -24,6 +24,12 @@ class ParseTree:
     def addnode(self, node):
         self.__nodelist.append(node)
 
+    def findNodebyToken(self, token):
+        for n in self.__nodelist:
+            if n.getWord.get_token == token:
+                return n
+        return None
+
     def traverse(self):
         visited = []
         node_queue = Queue()

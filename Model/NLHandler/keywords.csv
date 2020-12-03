@@ -5,14 +5,14 @@ ON|>: greater, over, greater than, more than, over than,more,more than,after,old
 ON|!=: not, no
 ON|BETWEEN: between, per, range
 ON|LIKE: like, likes, similar to
-ON|DISTINCT: distinct, different, distinctive, distinctly, unique
+DN|DISTINCT: distinct, different, distinctive, distinctly, unique
 FN|AVG: average, avg
 FN|SUM: sum,sum of,total
 FN|COUNT: number, how many, count
 FN|MAX: maximum, highest, max,most
 FN|MIN: minimum, lowest, min,least
-FN|ORDER: order, ordered
-FN|GROUP: group, grouped, clubbed
+OR|ORDER: order, ordered
+GN|GROUP: group, grouped, clubbed
 FN|ASC: ascending, increasing
 FN|DESC: descending, decreasing, inverse, reverse, opposite
 QN|ALL:all

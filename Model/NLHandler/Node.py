@@ -4,7 +4,7 @@ class Node:
         self.__word = word
         self.__component = component
         self.__parent = None
-        self.__children = None
+        self.__children = []
 
     @property
     def getIndex(self):
@@ -37,3 +37,6 @@ class Node:
 
     def setChildren(self, nodelist):
         self.__children = nodelist
+
+    def addChild(self, node):
+        self.__children.append(node)
