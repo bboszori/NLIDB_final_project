@@ -8,6 +8,8 @@ from Model.NLHandler.SQLComponent import SQLComponent
 from operator import attrgetter
 import string
 import re
+from collections import Counter
+from math import sqrt
 
 class Parser:
     def __init__(self, schema):
@@ -27,7 +29,7 @@ class Parser:
             wordlist = line.split(',')
 
             for word in wordlist:
-                self.__components[word] = SQLComponent(nodetype, kw)
+                self.__components[word] = SQLComponent(nodetype, word, symbol=kw)
 
         f.close()
 
@@ -65,13 +67,26 @@ class Parser:
 
         return pt
 
-    def similarityText(self, text1, text2):
-        doc1 = self.nlp(text1)
-        doc2 = self.nlp(text2)
-        return doc1.similarity(doc2)
+    def word2vec(self, txt):
+        # count the characters in word
+        cw = Counter(txt)
+        # precomputes a set of the different characters
+        sw = set(cw)
+        # precomputes the "length" of the word vector
+        lw = sqrt(sum(c * c for c in cw.values()))
+        # return a tuple
+        return cw, sw, lw
 
-    def similarityToken(self, token, text):
-        return token.similarity(self.nlp(text))
+    def cosdis(self, v1, v2):
+        # which characters are common to the two words?
+        common = v1[1].intersection(v2[1])
+        # by definition of cosine distance we have
+        return sum(v1[0][ch] * v2[0][ch] for ch in common) / v1[2] / v2[2]
+
+    def similarityText(self, text1, text2):
+        v1 = self.word2vec(text1)
+        v2 = self.word2vec(text2)
+        return self.cosdis(v1, v2)
 
     def getComponentoptions(self, node):
         result = set()
@@ -88,16 +103,16 @@ class Parser:
             return list(result)
 
         for table in self.__schema.getTablelist():
-            result.add(SQLComponent("NN", table.get_tablename, self.similarityText(word, table.get_tablename)))
+            result.add(SQLComponent("NN", table.get_tablename, self.similarityText(word, table.get_tablename.lower())))
 
             for column in table.get_columnlist:
                 result.add(SQLComponent("NN", table.get_tablename + "." + column.getName, self.similarityText(word,
-                                                                                                            column.getName)))
+                                                                                                            column.getName.lower())))
 
                 for value in column.get_samplevalues:
                     if value[0] != None:
                         valueNodes.add(SQLComponent("VN", table.get_tablename + "." + column.getName, self.similarityText(
-                            word, str(value[0]))))
+                            word, str(value[0]).lower())))
 
         for nodeInfo in valueNodes:
             result.add(nodeInfo)

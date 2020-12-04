@@ -4,6 +4,8 @@ from Model.DBHandler.Schema import Schema
 import mysql.connector
 from mysql.connector import (connection)
 from mysql.connector import errorcode
+import warnings
+warnings.filterwarnings("ignore", message=r"\[W007\]", category=UserWarning)
 
 config = {
   'user': 'testuser',
@@ -27,5 +29,9 @@ else:
     pt = parser.createParsetree('Return with all employees and their jobtitles')
 
 
-    l = parser.getComponentoptions(pt.get_root)
-    print(l[0].get_type)
+    print(pt.get_nodelist[5].getWord.get_text())
+    l = parser.getComponentoptions(pt.get_nodelist[5])
+    print('Component: ' + l[0].get_component)
+    print('Type: ' + l[0].get_type)
+    print('Similarity: ' + str(l[0].get_similarity))
+

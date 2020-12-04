@@ -1,8 +1,9 @@
 class SQLComponent:
-    def __init__(self, type: str, component: str, similarity = 1.0):
+    def __init__(self, type: str, component: str, similarity = 1.0, symbol=None):
         self.__type = type
         self.__component = component
         self.similarity = similarity
+        self.__symbol = symbol
 
     @property
     def get_type(self):
@@ -13,9 +14,13 @@ class SQLComponent:
         return self.__component
 
     @property
+    def get_symbol(self):
+        return self.__symbol
+
+    @property
     def get_similarity(self):
-        return self.__similarity
+        return self.similarity
 
     def setSimilarity(self, value):
-        self.__similarity = value
+        self.similarity = value
 
