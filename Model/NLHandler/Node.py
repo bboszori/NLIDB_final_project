@@ -1,6 +1,25 @@
 class Node:
-    def __init__(self, index=0, word=None, component=None):
-        self.__index = index
+    """
+        A class used to represent a node of a Parsetree
+
+        Attributes
+        ----------
+        word : Word
+            the token
+        component : SQLComponent
+            the sql component of the node
+        parent : Node
+            the parent of the node
+        children : Node[]
+            the list of the children of the node
+
+        Methods
+        -------
+        addChild(node):
+            Adding new child to the children list
+        """
+
+    def __init__(self, word=None, component=None):
         self.__word = word
         self.__component = component
         self.__parent = None

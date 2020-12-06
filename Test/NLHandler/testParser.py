@@ -26,11 +26,10 @@ except mysql.connector.Error as err:
 else:
     schema = Schema(cnx, 'classicmodels', 'mysql')
     parser = Parser(schema)
-    pt = parser.createParsetree('Return with all employees and their jobtitles')
+    pt = parser.createParsetree('Show the number of orders where the status is shipped')
 
-
-    print(pt.get_nodelist[5].getWord.get_text())
-    l = parser.getComponentoptions(pt.get_nodelist[5])
+    print(pt.get_root.getChildren[0].getWord.get_text())
+    l = parser.getComponentoptions(pt.get_root.getChildren[0])
     print('Component: ' + l[0].get_component)
     print('Type: ' + l[0].get_type)
     print('Similarity: ' + str(l[0].get_similarity))

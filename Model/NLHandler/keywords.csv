@@ -1,20 +1,20 @@
-SN|SELECT:return,fetch,give,print,show
-ON|=: is, equal, equals, equal to, equals to, are
-ON|<: less , less than,before,newer
-ON|>: greater, over, greater than, more than, over than,more,more than,after,older
-ON|!=: not, no
-ON|BETWEEN: between, per, range
-ON|LIKE: like, likes, similar to
-DN|DISTINCT: distinct, different, distinctive, distinctly, unique
-FN|AVG: average, avg
-FN|SUM: sum,sum of,total
-FN|COUNT: number, how many, count
-FN|MAX: maximum, highest, max,most
-FN|MIN: minimum, lowest, min,least
-OR|ORDER: order, ordered
-GN|GROUP: group, grouped, clubbed
-FN|ASC: ascending, increasing
-FN|DESC: descending, decreasing, inverse, reverse, opposite
+SN|SELECT:return,fetch,give,print,show,select
+ON|=:is,equal,equals,equal to,equals to,are
+ON|<:less ,less than,before,newer
+ON|>:greater,over,greater than,more than,over than,more,more than,after,older
+ON|!=:not,no
+ON|BETWEEN:between,per,range
+ON|LIKE:like,likes,similar to,similar
+DN|DISTINCT:distinct,different,distinctive,distinctly,unique
+FN|AVG:average,avg
+FN|SUM:sum,sum of,total
+FN|COUNT:number,how many,count
+FN|MAX:maximum,highest,max,most
+FN|MIN:minimum,lowest,min,least
+OR|ORDER:order,ordered
+GN|GROUP:group,grouped,clubbed
+FN|ASC:ascending,increasing
+FN|DESC:descending,decreasing,inverse,reverse,opposite
 QN|ALL:all
 QN|ANY:any
 QN|EACH:each

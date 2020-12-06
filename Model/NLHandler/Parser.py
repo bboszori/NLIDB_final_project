@@ -100,7 +100,7 @@ class Parser:
 
         if word in self.__components:
             result.add(self.__components[word])
-            return list(result)
+            #return list(result)
 
         for table in self.__schema.getTablelist():
             result.add(SQLComponent("NN", table.get_tablename, self.similarityText(word, table.get_tablename.lower())))
