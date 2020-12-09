@@ -29,7 +29,7 @@ class Parser:
             wordlist = line.split(',')
 
             for word in wordlist:
-                self.__components[word] = SQLComponent(nodetype, word, symbol=kw)
+                self.__components[word] = SQLComponent(nodetype, kw)
 
         f.close()
 
@@ -37,14 +37,18 @@ class Parser:
         pt = ParseTree()
 
         text = question
-        text = text.translate(str.maketrans('', '', string.punctuation))
-        text = " ".join(re.split("\s+", text, flags=re.UNICODE))
+        #text = text.translate(str.maketrans('', '', string.punctuation))
+        #text = " ".join(re.split("\s+", text, flags=re.UNICODE))
         userquestion = self.nlp(text)
 
         sentence = list(userquestion.sents)
         root = sentence[0].root
         rootnode = Node(word=Word(root))
-        pt.set_root(rootnode)
+        ptroot = Node(word="ROOT")
+        pt.set_root(ptroot)
+        rootnode.setParent(ptroot)
+        ptroot.addChild(rootnode)
+        pt.addnode(rootnode)
 
         children = Queue()
 
@@ -118,6 +122,9 @@ class Parser:
             result.add(nodeInfo)
 
         sortedResultList = sorted(result, key=attrgetter('similarity'), reverse=True)
+
+        if sortedResultList[0].get_similarity < 0.75:
+            sortedResultList.insert(0, SQLComponent("UNKNOWN", "UNKNOWN", 1.0))
 
         return sortedResultList
 

@@ -11,12 +11,8 @@ FN|SUM:sum,sum of,total
 FN|COUNT:number,how many,count
 FN|MAX:maximum,highest,max,most
 FN|MIN:minimum,lowest,min,least
-OR|ORDER:order,ordered
-GN|GROUP:group,grouped,clubbed
-FN|ASC:ascending,increasing
-FN|DESC:descending,decreasing,inverse,reverse,opposite
-QN|ALL:all
-QN|ANY:any
-QN|EACH:each
+GN|GROUP BY:group,grouped,clubbed
+OR|ASC:ascending,increasing
+OR|DESC:descending,decreasing,inverse,reverse,opposite
 LN|AND:and
 LN|OR:or

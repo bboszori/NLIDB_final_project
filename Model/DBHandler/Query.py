@@ -1,12 +1,12 @@
 class Query:
     def __init__(self):
-        self.__select = Select()
-        self.__function = Function()
-        self.__from = From()
-        self.__join = Join()
-        self.__where = Where()
-        self.__groupby = Groupby()
-        self.__orderby = Orderby()
+        self.select = Select()
+        self.function = Function()
+        self.fromq = From()
+        self.join = Join()
+        self.where = Where()
+        self.groupby = Groupby()
+        self.orderby = Orderby()
 
     def sqlquerystring(self):
         pass
@@ -87,7 +87,7 @@ class Join:
 
 class Where:
     def __init__(self, logicop=None):
-        self.__conditionlist = None
+        self.__conditionlist = []
         self.__logicop = logicop
 
     @property

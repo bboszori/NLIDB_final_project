@@ -15,7 +15,6 @@ class ParseTree:
 
     def set_root(self, node):
         self.__root = node
-        self.__nodelist.append(node)
 
     @property
     def get_nodelist(self):
@@ -30,18 +29,34 @@ class ParseTree:
                 return n
         return None
 
-    def traverse(self):
-        visited = []
-        node_queue = Queue()
-        node_queue.put(self.__root)
-        for ch in self.__root.getChildren:
-            node_queue.put(ch)
-        while node_queue.qsize() != 0:
-            next_node = node_queue.get()
-            visited.append(next_node)
-            ch = next_node.getChildren
-            if ch != None:
-                for child in ch:
-                    node_queue.put(child)
+    def removeunknownnodes(self):
+        for node in self.__nodelist:
+            if (node != self.__root) and (node.getComponent.get_type == "UNKNOWN"):
+                node.getParent.getChildren.remove(node)
+                node.setRemoved(True)
+                print("Removing: " + node.getWord.get_text())
+                for ch in node.getChildren:
+                    node.getParent.addChild(ch)
+                    ch.setParent(node.getParent)
 
-        return visited
+    def adjustTree(self):
+        self.checkSN()
+
+    def checkSN(self):
+        for n in self.__nodelist:
+            if n.getComponent.get_type == 'SN':
+                if n.getParent.getWord == "ROOT":
+                    return
+                while n.getParent.getWord != "ROOT":
+                    oldparent = n.getParent
+                    n.setParent(oldparent.getParent)
+                    n.getParent.getChildren.remove(oldparent)
+                    n.getParent.addChild(n)
+                    oldparent.setParent(n)
+                    oldparent.getChildren.remove(n)
+                    n.addChild(oldparent)
+
+
+
+
+

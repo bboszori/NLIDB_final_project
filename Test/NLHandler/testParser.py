@@ -5,6 +5,8 @@ import mysql.connector
 from mysql.connector import (connection)
 from mysql.connector import errorcode
 import warnings
+from Model.NLHandler.Translator import Translator
+from Model.DBHandler.Query import Query
 warnings.filterwarnings("ignore", message=r"\[W007\]", category=UserWarning)
 
 config = {
@@ -26,11 +28,27 @@ except mysql.connector.Error as err:
 else:
     schema = Schema(cnx, 'classicmodels', 'mysql')
     parser = Parser(schema)
-    pt = parser.createParsetree('Show the number of orders where the status is shipped')
+    #pt = parser.createParsetree('Show the number of orders before 2005.01.01')
+    pt = parser.createParsetree('Select the sum amount of payments grouped by customername')
 
-    print(pt.get_root.getChildren[0].getWord.get_text())
-    l = parser.getComponentoptions(pt.get_root.getChildren[0])
-    print('Component: ' + l[0].get_component)
-    print('Type: ' + l[0].get_type)
-    print('Similarity: ' + str(l[0].get_similarity))
+    for n in pt.get_nodelist:
+        l = parser.getComponentoptions(n)
+        n.setComponent(l[0])
 
+    pt.removeunknownnodes()
+
+    tr = Translator(pt)
+    query = tr.translateParsetree()
+
+    for ch in pt.get_nodelist:
+
+        if not ch.getRemoved:
+            print("Word: " + ch.getWord.get_text())
+            print("CT: " + ch.getComponent.get_type)
+            print("CT: " + ch.getComponent.get_component)
+            print("CP: " + str(ch.getComponent.get_similarity))
+            print(ch.getRemoved)
+            print('---------------------')
+            for n in ch.getChildren:
+                print(n.getWord.get_text())
+            print('---------------------')

@@ -23,6 +23,8 @@ class Node:
         self.__word = word
         self.__component = component
         self.__parent = None
+        self.__removed = False
+        self.__translated = False
         self.__children = []
 
     @property
@@ -35,6 +37,20 @@ class Node:
 
     def getText(self):
         return self.__word.get_text()
+
+    @property
+    def getRemoved(self):
+        return self.__removed
+
+    def setRemoved(self, removed):
+        self.__removed = removed
+
+    @property
+    def getTranslated(self):
+        return self.__translated
+
+    def setTranslated(self, translated):
+        self.__translated = translated
 
     @property
     def getComponent(self):
