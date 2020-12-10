@@ -3,7 +3,7 @@ from .Table import Table
 
 class Schema:
 
-    def __init__(self, dbconn, dbname, dbtype):
+    def __init__(self, dbconn, dbname, dbtype='mysql'):
 
         self.__cursor = dbconn.cursor()
         self.__tables = []

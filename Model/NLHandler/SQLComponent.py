@@ -24,3 +24,6 @@ class SQLComponent:
     def setSimilarity(self, value):
         self.similarity = value
 
+    def tostr(self):
+        return str(self.__type) + " - " + str(self.__component)
+

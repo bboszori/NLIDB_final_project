@@ -3,27 +3,25 @@ from mysql.connector import (connection)
 from mysql.connector import errorcode
 
 class Connection:
-    def __init__(self, host, dbName, user, password, dbtype = 'mysql'):
-        self.__host = host
-        self.__dbName = dbName
-        self.__user = user
-        self.__password = password
+    def __init__(self, dbtype = 'mysql'):
         self.__dbtype = dbtype
-        self.__connection = None
+        self.__dbName = ""
+        self.connection = None
 
-    def generateConfigdata(self):
+    def generateConfigdata(self, host, dbName, user, password):
         cf = {
-            'user': self.__user,
-            'password': self.__password,
-            'host': self.__host,
-            'database': self.__dbName,
+            'user': user,
+            'password': password,
+            'host': host,
+            'database': dbName,
             'raise_on_warnings': True
         }
         return cf
 
-    def connect(self):
+    def connect(self, host, dbName, user, password):
+        self.__dbName = dbName
         try:
-            self.__connection = connection.MySQLConnection(**self.generateConfigdata())
+            self.connection = connection.MySQLConnection(**self.generateConfigdata(host, dbName, user, password))
         except mysql.connector.Error as err:
             if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
                 print("Something is wrong with your user name or password")
@@ -31,11 +29,11 @@ class Connection:
                 print("Database does not exist")
             else:
                 print(err)
-            return None
+            return False
         else:
-            return self.__connection
+            return True
 
     def closeconnection(self):
-        if self.__connection != None:
-            self.__connection.close()
+        if self.connection != None:
+            self.connection.close()
 

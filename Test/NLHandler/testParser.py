@@ -29,7 +29,7 @@ else:
     schema = Schema(cnx, 'classicmodels', 'mysql')
     parser = Parser(schema)
     #pt = parser.createParsetree('Show the number of orders before 2005.01.01')
-    pt = parser.createParsetree('Show all employeename and their jobtitle')
+    pt = parser.createParsetree('Show all employee name and their jobtitle')
 
     for n in pt.get_nodelist:
         l = parser.getComponentoptions(n)
