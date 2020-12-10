@@ -125,32 +125,40 @@ class App(Frame):
         self.button_translate['state'] = 'disabled'
         question = self.entry_question.get()
         if self.controller.processQuestion(question):
-            nodes = self.controller.nodelist
-            choices = self.controller.choiceslist
+            self.nodes = self.controller.nodelist
+            self.choices = self.controller.choiceslist
             self.choicestext = []
 
             self.frame_choices.grid_columnconfigure(0,weight=1)
             self.frame_choices.grid_columnconfigure(1,weight=2)
-            for i in range(len(nodes)+1):
+            for i in range(len(self.nodes)+1):
                 self.frame_choices.grid_rowconfigure(i, weight=1)
 
             self.labels = []
             self.dropdowns = []
             self.clicked = []
 
-            for i in range(len(nodes)):
-                key = nodes[i].getWord.get_text()
+            for i in range(len(self.nodes)):
+                key = self.nodes[i].getWord.get_text()
                 choice = []
-                for ch in choices[i]:
+                for ch in self.choices[i]:
                     choice.append(ch.tostr())
                 self.choicestext.append(choice)
 
-                self.labels.append(Label(self.frame_choices, text=nodes[i].getWord.get_text()))
+                self.labels.append(Label(self.frame_choices, text=self.nodes[i].getWord.get_text()))
                 self.labels[i].grid(column=0, row=i, sticky="e")
                 self.clicked.append(StringVar())
                 self.clicked[i].set(choice[0])
                 self.dropdowns.append(OptionMenu(self.frame_choices, self.clicked[i], *self.choicestext[i]))
                 self.dropdowns[i].grid(column=1, row=i, sticky="nsew")
+
+            self.button_choices = Button(self.frame_choices, text="Select choices", padx=5, pady=5,
+                                         font=('Calibri',14, 'bold'), fg=self.text_color, command=self.selectedChoices)
+            self.button_choices.grid(column=1, row = i+1, sticky="se")
+
+    def selectedChoices(self):
+        for n in self.clicked:
+            print(n.get())
 
 
 
