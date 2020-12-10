@@ -1,8 +1,11 @@
 from Model.NLHandler.ParseTree import ParseTree
+from Model.NLHandler.Parser import Parser
+from Model.NLHandler.Translator import Translator
+from Model.DBHandler.Schema import Schema
+from Model.DBHandler.Query import Query
+from Model.DBHandler.Connection import Connection
 
 class ProgControl:
-    parseTree = None
-
     def __init__(self, Mainwindow):
         self.win = Mainwindow
 

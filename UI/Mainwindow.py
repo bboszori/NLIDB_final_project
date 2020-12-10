@@ -1,45 +1,41 @@
 from tkinter import *
 
-bg_color = '#F9C784'
-hl_color = '#FCAF58'
-strong_hl_color = '#FF8C42'
-text_color = '#4E598C'
+class App(Frame):
+    def __init__(self, root):
+        self.text_color = '#4E598C'
+        root.title('DataWiz')
+        root.iconbitmap('icon.ico')
+        Frame.__init__(self, root)
+        self.pack(fill=BOTH, expand=1)
 
-master = Tk()
-master.title('DataWiz')
-master.iconbitmap('icon.ico')
-master.state('zoomed')
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=4)
 
-main_frame = Frame(master)
-main_frame.pack(fill=BOTH, expand=1)
-
-main_canvas = Canvas(main_frame, bg=bg_color)
-main_canvas.pack(side=LEFT, fill=BOTH, expand=1)
-scrollbar = Scrollbar(main_frame, orient=VERTICAL, command=main_canvas.yview)
-scrollbar.pack(side=RIGHT, fill=Y)
-
-main_canvas.configure(yscrollcommand=scrollbar.set)
-main_canvas.bind('<Configure>', lambda e: main_canvas.configure(scrollregion=main_canvas.bbox("all")))
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(1, weight=2)
+        self.grid_rowconfigure(2, weight=2)
+        self.grid_rowconfigure(3, weight=2)
+        self.grid_rowconfigure(4, weight=2)
+        self.grid_rowconfigure(5, weight=1)
 
 
-title_frame = Frame(main_canvas, width=master.winfo_width()/4, height=100, bg=bg_color,
-                    highlightbackground="#FCAF58",  highlightcolor="#FCAF58",
-                    highlightthickness=1)
-title_frame.place(relx = 0.0, rely = 0.0, anchor ='nw')
+        self.title_frame = Frame(self, width=root.winfo_width()/4, height=50)
+        self.title_frame.grid(column=0, row=0, sticky="nsew")
 
-MyLabel = Label(title_frame,text="DataWiz",font=('Calibri',50, 'bold'), fg=text_color, padx=5, pady=5, bg=bg_color)
+        self.myLabel = Label(self.title_frame,text="Data\nWiz",font=('Calibri',40, 'bold'), fg=self.text_color, padx=10,
+                             pady=10)
+        self.myLabel.pack()
 
-MyLabel.place(x=0.0, y=0.0, anchor='nw')
+        self.frame_db = LabelFrame(self, text= "Database connection", height=root.winfo_height()-50,
+                  width=root.winfo_width()/4, padx=10, pady=10)
+        self.frame_db.grid(column=0, row=1, rowspan=4, sticky="nsew")
+
+        self.grid_columnconfigure(0, weight=1)
+        for i in range(10):
+            self.frame_db.grid_rowconfigure(i, weight=1)
+
+        self.question_frame = LabelFrame(self, text="Ask the question", height=100, width=root.winfo_width(
+            )*0.75, padx=10, pady=10)
+        self.question_frame.grid(column=1,row=0, sticky="nsew")
 
 
-frame_db = Frame(main_canvas, height=master.winfo_height()-100, width=master.winfo_width()/4)
-frame_db.place(x=0.0, y=100, anchor ='nw')
-
-question_frame = Frame(main_canvas, height=100, width=master.winfo_width()*0.75, padx=5, pady=5)
-question_frame.place(x=master.winfo_width()/4, y=0.0, anchor='nw')
-
-
-
-
-
-master.mainloop()

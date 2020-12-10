@@ -1,5 +1,7 @@
+from Model.DBHandler.Schema import Schema
 class Query:
-    def __init__(self):
+    def __init__(self, schema):
+        self.schema = schema
         self.select = Select()
         self.function = Function()
         self.fromq = From()
@@ -9,7 +11,87 @@ class Query:
         self.orderby = Orderby()
 
     def sqlquerystring(self):
-        pass
+        ss = self.selectstring()
+        fs = self.fromstring()
+        ws = self.wherestring()
+        gs = self.groupstring()
+        os = self.orderstring()
+
+        return ss + fs + ws + gs + os
+
+
+    def selectstring(self):
+        sn = "SELECT "
+        if self.select.get_distinct:
+            sn += "DISTINCT "
+        if self.function.get_column != None:
+            self.select.addcolumn(self.function.get_column)
+        if len(self.select.get_columnlist) == 0:
+            self.select.addcolumn("*")
+
+        for c in self.select.get_columnlist:
+            if c == self.function.get_column:
+                self.select.get_columnlist.remove(c)
+                c = self.function.get_type + "(" + self.function.get_column + ")"
+                self.select.addcolumn(c)
+
+        cl=''
+        if len(self.select.get_columnlist) > 1:
+            cl = ', '.join(self.select.get_columnlist)
+        elif len(self.select.get_columnlist) == 1:
+            cl = self.select.get_columnlist[0]
+
+        sn += cl + " "
+
+        return sn
+
+    def fromstring(self):
+        tables = self.fromq.get_tablelist
+        fn = ""
+        if len(tables) == 1:
+            fn += "FROM " + tables[0]
+        if len(tables) == 2:
+            jk = self.schema.getJoinKeys(tables[0], tables[1])
+            if jk == "":
+                print('Failure')
+            else:
+                fn += "FROM " + tables[0] + " INNER JOIN " + tables[1] + " " + jk + " "
+        else:
+            print('Failure')
+
+        return fn
+
+    def wherestring(self):
+        wn = "WHERE "
+        if len(self.where.get_conditionlist) == 0:
+            return ""
+        if len(self.where.get_conditionlist) == 1:
+            cond = self.where.get_conditionlist[0].get_condstr()
+            wn += cond
+        if len(self.where.get_conditionlist) == 2:
+            cond1 = self.where.get_conditionlist[0].get_condstr()
+            cond2 = self.where.get_conditionlist[1].get_condstr()
+            wn += cond1 + " " + self.where.get_logicop + " " + cond2
+        else:
+            print('Failure')
+
+        return wn
+
+    def groupstring(self):
+        gn = "GROUP BY "
+        if self.groupby.get_column == None:
+            return ""
+        else:
+            gn += self.groupby.get_column + " "
+        return gn
+
+    def orderstring(self):
+        on = "ORDER BY "
+        if self.orderby.get_column == None:
+            return ""
+        else:
+            on += self.orderby.get_column + " " + self.orderby.get_type + " "
+        return on
 
 
 class Select:
@@ -41,6 +123,8 @@ class Select:
             return True
         else:
             return False
+
+
 
 class Function:
     def __init__(self, type=None, column=None):
@@ -131,6 +215,9 @@ class Condition:
 
     def set_value(self, column):
         self.__column = column
+
+    def get_condstr(self):
+        return self.__column + " " + self.__operator + " " + self.value
 
 class Groupby:
     def __init__(self, column=None):

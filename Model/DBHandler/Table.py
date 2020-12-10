@@ -49,7 +49,7 @@ class Table:
     def get_foreign_keys(self):
         foreign_keys = []
         for column in self.__columnlist:
-            if column.get_foreign():
+            if column.get_foreign:
                 foreign_keys.append(column)
         return foreign_keys
 

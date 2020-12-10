@@ -111,6 +111,9 @@ class Schema:
             currtable.get_column(item[1]).add_foreign_key(item[2], item[3])
 
     def retrieveMySQLConnections(self):
+        for tableName in self.getTableNames():
+            self.__connections[tableName] = list()
+
         self.__cursor.execute("SELECT table_name, column_name, referenced_table_name, referenced_column_name from "
                              "information_schema.key_column_usage where referenced_table_name is not null AND "
                               "TABLE_SCHEMA = '%s'" % self.__dbName)
@@ -159,30 +162,28 @@ class Schema:
         return path
 
     def getJoinKeys(self, table1, table2):
-        table1Keys = table1.get_primarykeys()
-        table2Keys = table2.get_primarykeys()
+        on = ""
+        fk1 = self.gettablebyname(table1).get_foreign_keys()
+        ref1 = None
+        if len(fk1) == 1:
+            ref1 = fk1[0].get_references
+        fk2 = self.gettablebyname(table2).get_foreign_keys()
+        ref2 = None
+        if len(fk2) == 1:
+            ref2 = fk2[0].get_references
+        if ref1 != None:
+            if table2 in ref1:
+                col1 = fk1[0].getName
+                col2 = ref1[table2]
+                return "ON " + table1 + '.' + col1 + ' = ' + table2 + '.' + col2
+        if ref2 != None:
+            if table1 in ref2:
+                col2 = fk2[0].getName
+                col1 = ref1[table1]
+                return "ON " + table2 + '.' + col2 + ' = ' + table1 + '.' + col1
+        else:
+            return ""
 
-        if table1Keys == table2Keys:
-            return set()
-        keys1ContainedIn2 = True
-
-        for table1Key in table1Keys:
-            if not table2.contains_column(table1Key.getName()):
-                keys1ContainedIn2 = False
-                break
-
-        if keys1ContainedIn2:
-            return set(table1Keys)
-
-        keys2ContainedIn1 = True
-        for table2Key in table2Keys:
-            if not table1.contains_column(table2Key.getName()):
-                keys2ContainedIn1 = False
-                break
-
-        if keys2ContainedIn1:
-            return set(table2Keys)
-        return set()
 
     def getTablelist(self):
         return self.__tables
@@ -190,7 +191,7 @@ class Schema:
     def getTableNames(self):
         tableList = []
         for table in self.__tables:
-            tableList.append(table.get_tablename())
+            tableList.append(table.get_tablename)
         return tableList
 
     def gettablebyname(self, tname):

@@ -29,7 +29,7 @@ else:
     schema = Schema(cnx, 'classicmodels', 'mysql')
     parser = Parser(schema)
     #pt = parser.createParsetree('Show the number of orders before 2005.01.01')
-    pt = parser.createParsetree('Select the sum amount of payments grouped by customername')
+    pt = parser.createParsetree('Show all employeename and their jobtitle')
 
     for n in pt.get_nodelist:
         l = parser.getComponentoptions(n)
@@ -37,18 +37,19 @@ else:
 
     pt.removeunknownnodes()
 
-    tr = Translator(pt)
+    tr = Translator(pt, schema)
     query = tr.translateParsetree()
+    print(query.sqlquerystring())
 
-    for ch in pt.get_nodelist:
-
-        if not ch.getRemoved:
-            print("Word: " + ch.getWord.get_text())
-            print("CT: " + ch.getComponent.get_type)
-            print("CT: " + ch.getComponent.get_component)
-            print("CP: " + str(ch.getComponent.get_similarity))
-            print(ch.getRemoved)
-            print('---------------------')
-            for n in ch.getChildren:
-                print(n.getWord.get_text())
-            print('---------------------')
+    # for ch in pt.get_nodelist:
+    #
+    #     if not ch.getRemoved:
+    #         print("Word: " + ch.getWord.get_text())
+    #         print("CT: " + ch.getComponent.get_type)
+    #         print("CT: " + ch.getComponent.get_component)
+    #         print("CP: " + str(ch.getComponent.get_similarity))
+    #         print(ch.getRemoved)
+    #         print('---------------------')
+    #         for n in ch.getChildren:
+    #             print(n.getWord.get_text())
+    #         print('---------------------')

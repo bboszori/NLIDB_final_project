@@ -3,9 +3,9 @@ from Model.NLHandler.Parser import Parser
 from Model.NLHandler.ParseTree import ParseTree
 
 class Translator:
-    def __init__(self, parsetree):
+    def __init__(self, parsetree, schema):
         self.__parsetree = parsetree
-        self.__query = Query()
+        self.__query = Query(schema)
 
     def translateParsetree(self):
         for node in self.__parsetree.get_nodelist:
@@ -106,6 +106,7 @@ class Translator:
                     chname = ch.getComponent.get_component
                     if '.' in chname:
                         self.__query.groupby.set_column(chname)
+                        self.__query.select.addcolumn(chname)
                         table = chname.split('.')[0]
                         self.__query.fromq.addtable(table)
         else:
@@ -115,6 +116,7 @@ class Translator:
                 chname = parent.getComponent.get_component
                 if '.' in chname:
                     self.__query.groupby.set_column(chname)
+                    self.__query.select.addcolumn(chname)
                     table = chname.split('.')[0]
                     self.__query.fromq.addtable(table)
             else:
@@ -131,6 +133,7 @@ class Translator:
                     chname = ch.getComponent.get_component
                     if '.' in chname:
                         self.__query.function.set_column(chname)
+                        self.__query.select.addcolumn(chname)
                         table = chname.split('.')[0]
                         self.__query.fromq.addtable(table)
                     else:
@@ -143,6 +146,7 @@ class Translator:
                 chname = parent.getComponent.get_component
                 if '.' in chname:
                     self.__query.function.set_column(chname)
+                    self.__query.select.addcolumn(chname)
                     table = chname.split('.')[0]
                     self.__query.fromq.addtable(table)
                 else:
