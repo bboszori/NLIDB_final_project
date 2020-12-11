@@ -211,10 +211,10 @@ class Condition:
 
     @property
     def get_value(self):
-        return self.__column
+        return self.value
 
-    def set_value(self, column):
-        self.__column = column
+    def set_value(self, value):
+        self.value = str(value)
 
     def get_condstr(self):
         cond = ("%s %s '%s' " % (self.__column, self.__operator, self.value))

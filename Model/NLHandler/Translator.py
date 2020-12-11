@@ -87,7 +87,7 @@ class Translator:
                 parent.setTranslated(True)
                 chcol = parent.getComponent.get_component
                 chname = parent.getWord.get_text()
-                if '.' in chname:
+                if '.' in chcol:
                     cond.set_column(chcol)
                     cond.set_value(chname)
                     table = chcol.split('.')[0]
