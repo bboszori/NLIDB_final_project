@@ -11,12 +11,14 @@ class ProgControl:
         self.schema = None
         self.parser = None
         self.schema = None
+        self.query = None
         self.host = ""
         self.dbname = ""
         self.user = ""
         self.password = ""
         self.nodelist = []
         self.choiceslist = []
+        self.pt = None
 
     # todo
     def initDBConnention(self):
@@ -29,23 +31,27 @@ class ProgControl:
 
 
     def processQuestion(self, input):
-        pt = self.parser.createParsetree(input)
-        return self.mappingNodes(pt)
+        self.pt = self.parser.createParsetree(input)
+        return self.mappingNodes()
 
-    def mappingNodes(self, pt):
-        for node in pt.get_nodelist:
+    def mappingNodes(self):
+        for node in self.pt.get_nodelist:
             self.nodelist.append(node)
             self.choiceslist.append(self.parser.getComponentoptions(node)[:5])
 
         return True
 
-    # TODO
-    def selectingTree(self):
-        pass
+    def setChoices(self, choicelist):
+        for i in range(len(choicelist)):
+            self.pt.get_nodelist[i].setComponent(self.choiceslist[i][choicelist[i]])
+        self.pt.removeunknownnodes()
+        self.translatePt()
 
-    #TODO
-    def translator(self):
-        pass
+
+    def translatePt(self):
+        translator = Translator(self.pt, self.schema)
+        self.query = translator.translateParsetree()
+
 
 
 

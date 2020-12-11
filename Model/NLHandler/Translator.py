@@ -30,7 +30,7 @@ class Translator:
                 if ntype == 'NN':
                     self.translateNN(node)
                 if ntype == 'VN':
-                    pass
+                    self.translateVN(node)
 
         return self.__query
 
@@ -164,3 +164,16 @@ class Translator:
             self.__query.fromq.addtable(table)
         else:
             self.__query.fromq.addtable(chname)
+
+    def translateVN(self, node):
+        if node.getParent.getComponent.get_type == 'ON':
+            return
+        for ch in node.getChildren:
+            if ch.getComponent.get_type == 'ON':
+                return
+        cond = Condition(node.getComponent.get_component, "=", value=node.getWord.get_text())
+        self.__query.where.addcondition(cond)
+        chname = node.getComponent.get_component
+        if '.' in chname:
+            table = chname.split('.')[0]
+            self.__query.fromq.addtable(table)

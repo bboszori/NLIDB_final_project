@@ -49,7 +49,7 @@ class Query:
         tables = self.fromq.get_tablelist
         fn = ""
         if len(tables) == 1:
-            fn += "FROM " + tables[0]
+            fn += "FROM " + tables[0] + " "
         if len(tables) == 2:
             jk = self.schema.getJoinKeys(tables[0], tables[1])
             if jk == "":
@@ -217,7 +217,8 @@ class Condition:
         self.__column = column
 
     def get_condstr(self):
-        return self.__column + " " + self.__operator + " " + self.value
+        cond = ("%s %s '%s' " % (self.__column, self.__operator, self.value))
+        return cond
 
 class Groupby:
     def __init__(self, column=None):
