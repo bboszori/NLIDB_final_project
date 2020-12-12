@@ -2,12 +2,14 @@ from tkinter import *
 from tkinter import messagebox
 from Controller.ProgControl import ProgControl
 from UI.Schemawindow import Schemawindow
+from UI.DataWindow import Datawindow
 
 class App(Frame):
     def __init__(self, root):
         self.controller = ProgControl()
         self.text_color = '#4E598C'
         self.root = root
+        self.datawindow = None
 
         self.nodes = None
         self.choices = None
@@ -36,9 +38,6 @@ class App(Frame):
         self.main_frame.grid_rowconfigure(2, weight=3)
         self.main_frame.grid_rowconfigure(3, weight=3)
         self.main_frame.grid_rowconfigure(4, weight=3)
-        self.main_frame.grid_rowconfigure(5, weight=3)
-        self.main_frame.grid_rowconfigure(6, weight=3)
-
 
         self.title_frame = Frame(self.main_frame)
         self.title_frame.grid(column=0, row=0, sticky="nsew")
@@ -125,12 +124,9 @@ class App(Frame):
                                  fg=self.text_color, padx=5, pady=5, wraplength=550, justify="left")
         self.query_label.grid(row=0, sticky="nsew")
         self.button_query = Button(self.frame_query, text="Run query", padx=5, pady=5,
-                                   font=('Calibri', 14, 'bold'), fg=self.text_color)
+                                   font=('Calibri', 14, 'bold'), fg=self.text_color, command=self.runQuery)
         #self.button_query.grid(row = 1, sticky="se")
         self.button_query.grid_forget()
-
-        self.frame_data = LabelFrame(self.main_frame, text="Data", padx=10, pady=10)
-        self.frame_data.grid(column=1, row=5, rowspan=2, sticky="nsew")
 
     def dbconnection(self):
         self.controller.host = self.text_host.get()
@@ -196,6 +192,9 @@ class App(Frame):
         self.query_label["text"] = ""
         self.button_query.grid_forget()
         self.controller.query = None
+        if self.datawindow != None:
+            self.datawindow.destroy()
+
 
     def clearchoices(self):
         self.nodes = None
@@ -221,11 +220,17 @@ class App(Frame):
 
         self.clearchoices()
         self.controller.setChoices(final)
-        querytext= self.controller.query.sqlquerystring()
+        querytext= self.controller.querystring
         self.query_label['text']= querytext
         print(querytext)
         self.button_query.grid(row = 1, sticky="se")
 
+    def runQuery(self):
+        try:
+            data = self.controller.runQuery()
+            self.datawindow = Datawindow(self.root, data)
+        except:
+            messagebox.showerror("Error", "Some error occured while fetching data.")
 
 
 

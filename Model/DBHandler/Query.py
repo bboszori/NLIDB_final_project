@@ -50,12 +50,13 @@ class Query:
         fn = ""
         if len(tables) == 1:
             fn += "FROM " + tables[0] + " "
-        if len(tables) == 2:
-            jk = self.schema.getJoinKeys(tables[0], tables[1])
-            if jk == "":
-                print('Failure')
-            else:
+        elif len(tables) == 2:
+            jk = ""
+            if self.schema.isConnection(tables[0], tables[1]):
+                jk = self.schema.getJoinKeys(tables[0], tables[1])
                 fn += "FROM " + tables[0] + " INNER JOIN " + tables[1] + " " + jk + " "
+            else:
+                print('Failure')
         else:
             print('Failure')
 
@@ -63,15 +64,34 @@ class Query:
 
     def wherestring(self):
         wn = "WHERE "
+        b = False
         if len(self.where.get_conditionlist) == 0:
             return ""
         if len(self.where.get_conditionlist) == 1:
             cond = self.where.get_conditionlist[0].get_condstr()
             wn += cond
-        if len(self.where.get_conditionlist) == 2:
-            cond1 = self.where.get_conditionlist[0].get_condstr()
-            cond2 = self.where.get_conditionlist[1].get_condstr()
-            wn += cond1 + " " + self.where.get_logicop + " " + cond2
+        elif len(self.where.get_conditionlist) == 2:
+            for c in self.where.get_conditionlist:
+                if c.get_operator == 'BETWEEN':
+                    b = True
+            if b:
+                condb = ""
+                cond2 = ""
+                for c in self.where.get_conditionlist:
+                    if c.get_operator == 'BETWEEN':
+                        condb = c.get_condstr()
+                    else:
+                        cond2 = ("AND '%s' " % c.get_value)
+
+                wn += condb + '' + cond2
+
+            elif self.where.get_logicop != None:
+                cond1 = self.where.get_conditionlist[0].get_condstr()
+                cond2 = self.where.get_conditionlist[1].get_condstr()
+                wn += cond1 + " " + self.where.get_logicop + " " + cond2
+            else:
+                cond1 = self.where.get_conditionlist[0].get_condstr()
+                wn += cond1
         else:
             print('Failure')
 

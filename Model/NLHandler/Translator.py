@@ -132,12 +132,12 @@ class Translator:
                     ch.setTranslated(True)
                     chname = ch.getComponent.get_component
                     if '.' in chname:
-                        self.__query.function.set_column(chname)
+                        self.__query.orderby.set_column(chname)
                         self.__query.select.addcolumn(chname)
                         table = chname.split('.')[0]
                         self.__query.fromq.addtable(table)
                     else:
-                        self.__query.function.set_column('*')
+                        self.__query.orderby.set_column('*')
                         self.__query.fromq.addtable(chname)
         else:
             parent = node.getParent

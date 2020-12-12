@@ -10,6 +10,7 @@ class Schema:
         self.__rowDict = dict()
         self.__keys = dict()
         self.__connections = dict()
+        self.__keypairs = dict()
         self.__dbName = dbname
 
         if dbtype == "mssql":
@@ -124,6 +125,18 @@ class Schema:
             currtable = self.gettablebyname(item[0])
             currtable.add_foreign_key(item[1], item[2], item[3])
 
+        for fk in forkeys:
+            table1 = fk[0]
+            table2 = fk[2]
+            if not table2 in self.__connections[table1]:
+                self.__connections[table1].append(table2)
+            if not table1 in self.__connections[table2]:
+                self.__connections[table2].append(table1)
+
+            ts = table1 + "." + table2
+            kp = table1 + "." + fk[1] + "=" + table2 + "." + fk[3]
+            self.__keypairs[ts] = kp
+
     def getJoinPath(self, table1, table2):
 
         if not (table1 in self.__tables) or not (table2 in self.__tables):
@@ -162,27 +175,21 @@ class Schema:
         return path
 
     def getJoinKeys(self, table1, table2):
-        on = ""
-        fk1 = self.gettablebyname(table1).get_foreign_keys()
-        ref1 = None
-        if len(fk1) == 1:
-            ref1 = fk1[0].get_references
-        fk2 = self.gettablebyname(table2).get_foreign_keys()
-        ref2 = None
-        if len(fk2) == 1:
-            ref2 = fk2[0].get_references
-        if ref1 != None:
-            if table2 in ref1:
-                col1 = fk1[0].getName
-                col2 = ref1[table2]
-                return "ON " + table1 + '.' + col1 + ' = ' + table2 + '.' + col2
-        if ref2 != None:
-            if table1 in ref2:
-                col2 = fk2[0].getName
-                col1 = ref1[table1]
-                return "ON " + table2 + '.' + col2 + ' = ' + table1 + '.' + col1
+        ts1 = table1 + "." + table2
+        ts2 = table2 + "." + table1
+        if ts1 in self.__keypairs:
+            return "ON " + self.__keypairs[ts1]
+        elif ts2 in self.__keypairs:
+            return "ON " + self.__keypairs[ts2]
         else:
             return ""
+
+
+    def isConnection(self,table1, table2):
+        if (table2 in self.__connections[table1]) or (table1 in self.__connections[table2]):
+            return True
+        else:
+            return False
 
 
     def getTablelist(self):

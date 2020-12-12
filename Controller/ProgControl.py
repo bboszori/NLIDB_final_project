@@ -1,9 +1,11 @@
 from Model.NLHandler.ParseTree import ParseTree
 from Model.NLHandler.Parser import Parser
 from Model.NLHandler.Translator import Translator
+from Model.NLHandler.SQLComponent import SQLComponent
 from Model.DBHandler.Schema import Schema
 from Model.DBHandler.Query import Query
 from Model.DBHandler.Connection import Connection
+import pandas as pd
 
 class ProgControl:
     def __init__(self):
@@ -16,6 +18,7 @@ class ProgControl:
         self.dbname = ""
         self.user = ""
         self.password = ""
+        self.querystring = ""
         self.nodelist = []
         self.choiceslist = []
         self.pt = None
@@ -37,7 +40,9 @@ class ProgControl:
     def mappingNodes(self):
         for node in self.pt.get_nodelist:
             self.nodelist.append(node)
-            self.choiceslist.append(self.parser.getComponentoptions(node)[:5])
+            l = self.parser.getComponentoptions(node)[:5]
+            l.append(SQLComponent("UNKNOWN", "UNKNOWN"))
+            self.choiceslist.append(l)
 
         return True
 
@@ -51,7 +56,11 @@ class ProgControl:
     def translatePt(self):
         translator = Translator(self.pt, self.schema)
         self.query = translator.translateParsetree()
+        self.querystring = self.query.sqlquerystring()
 
+    def runQuery(self):
+        data = pd.read_sql(self.querystring, self.connection.connection)
+        return data
 
 
 
