@@ -10,6 +10,7 @@ class App(Frame):
         self.text_color = '#4E598C'
         self.root = root
         self.datawindow = None
+        self.schemawindow = None
 
         self.nodes = None
         self.choices = None
@@ -20,7 +21,6 @@ class App(Frame):
 
         Frame.__init__(self, root)
         self.initialize_user_interface()
-
 
     def initialize_user_interface(self):
         self.root.title('DataWiz')
@@ -138,7 +138,7 @@ class App(Frame):
             self.button_disconnect.grid(row=10, sticky="nsew")
             self.button_connect.grid_forget()
             self.button_translate['state'] = 'normal'
-            Schemawindow(self.root, self.controller.schema)
+            self.schemawindow = Schemawindow(self.root, self.controller.schema)
         else:
             messagebox.showerror("Connection error", "We can not connect to the database.")
 
@@ -147,39 +147,43 @@ class App(Frame):
         self.button_disconnect.grid_forget()
         self.button_connect.grid(row=9, sticky="nsew")
         self.button_translate['state'] = 'disabled'
+        self.resetTranslator()
+        self.schemawindow = None
 
     def starttranslate(self):
-        #self.button_translate['state'] = 'disabled'
         self.button_translate.grid_forget()
         self.button_reset.grid(row=1, sticky="ne")
 
         question = self.entry_question.get()
-        if self.controller.processQuestion(question):
-            self.nodes = self.controller.nodelist
-            self.choices = self.controller.choiceslist
+        if question != "":
+            if self.controller.processQuestion(question):
+                self.nodes = self.controller.nodelist
+                self.choices = self.controller.choiceslist
 
-            self.frame_choices.grid_columnconfigure(0,weight=1)
-            self.frame_choices.grid_columnconfigure(1,weight=2)
-            for i in range(len(self.nodes)+1):
-                self.frame_choices.grid_rowconfigure(i, weight=1)
+                self.frame_choices.grid_columnconfigure(0,weight=1)
+                self.frame_choices.grid_columnconfigure(1,weight=2)
+                for i in range(len(self.nodes)+1):
+                    self.frame_choices.grid_rowconfigure(i, weight=1)
 
-            for i in range(len(self.nodes)):
-                key = self.nodes[i].getWord.get_text()
-                choice = []
-                for ch in self.choices[i]:
-                    choice.append(ch.tostr())
-                self.choicestext.append(choice)
+                for i in range(len(self.nodes)):
+                    key = self.nodes[i].getWord.get_text()
+                    choice = []
+                    for ch in self.choices[i]:
+                        choice.append(ch.tostr())
+                    self.choicestext.append(choice)
 
-                self.labels.append(Label(self.frame_choices, text=self.nodes[i].getWord.get_text()))
-                self.labels[i].grid(column=0, row=i, sticky="e")
-                self.clicked.append(StringVar())
-                self.clicked[i].set(choice[0])
-                self.dropdowns.append(OptionMenu(self.frame_choices, self.clicked[i], *self.choicestext[i]))
-                self.dropdowns[i].grid(column=1, row=i, sticky="nsew")
+                    self.labels.append(Label(self.frame_choices, text=self.nodes[i].getWord.get_text()))
+                    self.labels[i].grid(column=0, row=i, sticky="e")
+                    self.clicked.append(StringVar())
+                    self.clicked[i].set(choice[0])
+                    self.dropdowns.append(OptionMenu(self.frame_choices, self.clicked[i], *self.choicestext[i]))
+                    self.dropdowns[i].grid(column=1, row=i, sticky="nsew")
 
-            self.button_choices = Button(self.frame_choices, text="Select choices", padx=5, pady=5,
+                self.button_choices = Button(self.frame_choices, text="Select choices", padx=5, pady=5,
                                          font=('Calibri',14, 'bold'), fg=self.text_color, command=self.selectedChoices)
-            self.button_choices.grid(column=1, row = i+1, sticky="se")
+                self.button_choices.grid(column=1, row = i+1, sticky="se")
+            else:
+                messagebox.showerror("Error", "There was some problem with the translation")
 
     def resetTranslator(self):
         self.clearchoices()
@@ -194,7 +198,6 @@ class App(Frame):
         self.controller.query = None
         if self.datawindow != None:
             self.datawindow.destroy()
-
 
     def clearchoices(self):
         self.nodes = None
@@ -219,11 +222,15 @@ class App(Frame):
             final.append(choices.index(self.clicked[i].get()))
 
         self.clearchoices()
-        self.controller.setChoices(final)
-        querytext= self.controller.querystring
-        self.query_label['text']= querytext
-        print(querytext)
-        self.button_query.grid(row = 1, sticky="se")
+        try:
+            self.controller.setChoices(final)
+            querytext= self.controller.querystring
+            self.query_label['text']= querytext
+            print(querytext)
+            self.button_query.grid(row = 1, sticky="se")
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
+            self.resetTranslator()
 
     def runQuery(self):
         try:
@@ -231,7 +238,7 @@ class App(Frame):
             self.datawindow = Datawindow(self.root, data)
         except:
             messagebox.showerror("Error", "Some error occured while fetching data.")
-
+            self.resetTranslator()
 
 
 

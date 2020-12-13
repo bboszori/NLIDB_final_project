@@ -1,4 +1,3 @@
-from Model.DBHandler.Schema import Schema
 class Query:
     def __init__(self, schema):
         self.schema = schema
@@ -16,14 +15,18 @@ class Query:
         gs = self.groupstring()
         os = self.orderstring()
 
-        return ss + fs + ws + gs + os
-
+        if ss == "":
+            raise Exception("There is no select clause in the query")
+        elif fs == "":
+            raise Exception("There is no FROM clause in the query")
+        else:
+            return ss + fs + ws + gs + os
 
     def selectstring(self):
         sn = "SELECT "
         if self.select.get_distinct:
             sn += "DISTINCT "
-        if self.function.get_column != None:
+        if self.function.get_column is not None:
             self.select.addcolumn(self.function.get_column)
         if len(self.select.get_columnlist) == 0:
             self.select.addcolumn("*")
@@ -34,7 +37,7 @@ class Query:
                 c = self.function.get_type + "(" + self.function.get_column + ")"
                 self.select.addcolumn(c)
 
-        cl=''
+        cl = ''
         if len(self.select.get_columnlist) > 1:
             cl = ', '.join(self.select.get_columnlist)
         elif len(self.select.get_columnlist) == 1:
@@ -50,7 +53,6 @@ class Query:
         if len(tables) == 1:
             fn += "FROM " + tables[0] + " "
         elif len(tables) == 2:
-            jk = ""
             if self.schema.isConnection(tables[0], tables[1]):
                 jk = self.schema.getJoinKeys(tables[0], tables[1])
                 fn += "FROM " + tables[0] + " INNER JOIN " + tables[1] + " " + jk + " "
@@ -84,7 +86,7 @@ class Query:
 
                 wn += condb + '' + cond2
 
-            elif self.where.get_logicop != None:
+            elif self.where.get_logicop is not None:
                 cond1 = self.where.get_conditionlist[0].get_condstr()
                 cond2 = self.where.get_conditionlist[1].get_condstr()
                 wn += cond1 + " " + self.where.get_logicop + " " + cond2
@@ -98,7 +100,7 @@ class Query:
 
     def groupstring(self):
         gn = "GROUP BY "
-        if self.groupby.get_column == None:
+        if self.groupby.get_column is None:
             return ""
         else:
             gn += self.groupby.get_column + " "
@@ -106,7 +108,7 @@ class Query:
 
     def orderstring(self):
         on = "ORDER BY "
-        if self.orderby.get_column == None:
+        if self.orderby.get_column is None:
             return ""
         else:
             on += self.orderby.get_column + " " + self.orderby.get_type + " "
@@ -114,9 +116,9 @@ class Query:
 
 
 class Select:
-    def __init__(self, columnlist = None, distinct = False):
+    def __init__(self, columnlist=None, distinct=False):
         self.__distinct = distinct
-        if columnlist == None:
+        if columnlist is None:
             self.__columnlist = []
         else:
             self.__columnlist = columnlist
@@ -132,7 +134,6 @@ class Select:
     def set_distinct(self, isdistinct):
         self.__distinct = isdistinct
 
-
     def addcolumn(self, column):
         if column not in self.__columnlist:
             self.__columnlist.append(column)
@@ -143,17 +144,18 @@ class Select:
         else:
             return False
 
+
 class Function:
-    def __init__(self, type=None, column=None):
-        self.__type = type
+    def __init__(self, t=None, column=None):
+        self.__type = t
         self.__column = column
 
     @property
     def get_type(self):
         return self.__type
 
-    def set_type(self, type):
-        self.__type = type
+    def set_type(self, t):
+        self.__type = t
 
     @property
     def get_column(self):
@@ -162,9 +164,10 @@ class Function:
     def set_column(self, column):
         self.__column = column
 
+
 class From:
     def __init__(self, tablelist=None):
-        if tablelist == None:
+        if tablelist is None:
             self.__tablelist = []
         else:
             self.__tablelist = tablelist
@@ -182,6 +185,7 @@ class From:
             return True
         else:
             return False
+
 
 class Where:
     def __init__(self, logicop=None):
@@ -202,6 +206,7 @@ class Where:
 
     def set_logicop(self, logicop):
         self.__logicop = logicop
+
 
 class Condition:
     def __init__(self, column=None, op=None, value=None):
@@ -234,6 +239,7 @@ class Condition:
         cond = ("%s %s '%s' " % (self.__column, self.__operator, self.value))
         return cond
 
+
 class Groupby:
     def __init__(self, column=None):
         self.__column = column
@@ -245,17 +251,18 @@ class Groupby:
     def set_column(self, column):
         self.__column = column
 
+
 class Orderby:
-    def __init__(self, type=None, column=None):
-        self.__type = type
+    def __init__(self, tp=None, column=None):
+        self.__type = tp
         self.__column = column
 
     @property
     def get_type(self):
         return self.__type
 
-    def set_type(self, type):
-        self.__type = type
+    def set_type(self, tp):
+        self.__type = tp
 
     @property
     def get_column(self):

@@ -1,4 +1,23 @@
 class Column:
+    """
+       A class used to represent a column of a database table
+
+       Attributes
+       ----------
+       name : string
+           name of the column
+       type : string
+           datatype of column
+       primary : boolean
+           if key is primary
+       primary : boolean
+           if key is primary
+
+       Methods
+       -------
+       addChild(node):
+           Adding new child to the children list
+       """
     def __init__(self, name, type, primary=False, foreign=False, sample=None, references = None):
         self.__columnname = name
         self.__type = type

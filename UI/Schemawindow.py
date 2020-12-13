@@ -10,7 +10,7 @@ class Schemawindow(Toplevel):
         self.schema = schema
         super().__init__(root)
         self.title("Database schema")
-        self.geometry("500x200")
+        self.geometry("500x300")
 
         self.tree_frame = Frame(self)
         self.tree_frame.pack()
