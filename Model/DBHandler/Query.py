@@ -5,7 +5,6 @@ class Query:
         self.select = Select()
         self.function = Function()
         self.fromq = From()
-        self.join = Join()
         self.where = Where()
         self.groupby = Groupby()
         self.orderby = Orderby()
@@ -144,8 +143,6 @@ class Select:
         else:
             return False
 
-
-
 class Function:
     def __init__(self, type=None, column=None):
         self.__type = type
@@ -185,9 +182,6 @@ class From:
             return True
         else:
             return False
-
-class Join:
-    pass
 
 class Where:
     def __init__(self, logicop=None):

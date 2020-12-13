@@ -5,8 +5,6 @@ class ParseTree:
     def __init__(self):
         self.__root = None
         self.__nodelist = []
-        self.__indexOfRightCoreNode = -1
-        self.__indexOfLeftCoreNode = -1
 
 
     @property
@@ -34,29 +32,8 @@ class ParseTree:
             if (node != self.__root) and (node.getComponent.get_type == "UNKNOWN"):
                 node.getParent.getChildren.remove(node)
                 node.setRemoved(True)
-                print("Removing: " + node.getWord.get_text())
+
                 for ch in node.getChildren:
                     node.getParent.addChild(ch)
                     ch.setParent(node.getParent)
-
-    def adjustTree(self):
-        self.checkSN()
-
-    def checkSN(self):
-        for n in self.__nodelist:
-            if n.getComponent.get_type == 'SN':
-                if n.getParent.getWord == "ROOT":
-                    return
-                while n.getParent.getWord != "ROOT":
-                    oldparent = n.getParent
-                    n.setParent(oldparent.getParent)
-                    n.getParent.getChildren.remove(oldparent)
-                    n.getParent.addChild(n)
-                    oldparent.setParent(n)
-                    oldparent.getChildren.remove(n)
-                    n.addChild(oldparent)
-
-
-
-
 
