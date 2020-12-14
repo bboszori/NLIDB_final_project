@@ -1,4 +1,4 @@
-from UI.Mainwindow import App
+from datawiz.UI.Mainwindow import App
 from tkinter import *
 
 class DataWiz:

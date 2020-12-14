@@ -1,6 +1,5 @@
-from Model.DBHandler.Query import *
-
-
+from datawiz.Model.DBHandler.Query import Query
+from datawiz.Model.DBHandler.Query import Condition
 class Translator:
     def __init__(self, parsetree, schema):
         self.__parsetree = parsetree

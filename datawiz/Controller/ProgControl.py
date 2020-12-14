@@ -1,8 +1,8 @@
-from Model.NLHandler.Parser import Parser
-from Model.NLHandler.Translator import Translator
-from Model.NLHandler.SQLComponent import SQLComponent
-from Model.DBHandler.Schema import Schema
-from Model.DBHandler.Connection import Connection
+from datawiz.Model.NLHandler.Parser import Parser
+from datawiz.Model.NLHandler.Translator import Translator
+from datawiz.Model.NLHandler.SQLComponent import SQLComponent
+from datawiz.Model.DBHandler.Schema import Schema
+from datawiz.Model.DBHandler.Connection import Connection
 import pandas as pd
 
 class ProgControl:

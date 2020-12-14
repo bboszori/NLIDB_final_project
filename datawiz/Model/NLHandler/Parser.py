@@ -1,9 +1,9 @@
 import spacy
 from queue import Queue
-from Model.NLHandler.ParseTree import ParseTree
-from Model.NLHandler.Node import Node
-from Model.NLHandler.Word import Word
-from Model.NLHandler.SQLComponent import SQLComponent
+from datawiz.Model.NLHandler.ParseTree import ParseTree
+from datawiz.Model.NLHandler.Node import Node
+from datawiz.Model.NLHandler.Word import Word
+from datawiz.Model.NLHandler.SQLComponent import SQLComponent
 from operator import attrgetter
 from collections import Counter
 from math import sqrt

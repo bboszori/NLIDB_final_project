@@ -1,5 +1,5 @@
-from .Column import Column
-from .Table import Table
+from datawiz.Model.DBHandler.Column import Column
+from datawiz.Model.DBHandler.Table import Table
 
 class Schema:
 

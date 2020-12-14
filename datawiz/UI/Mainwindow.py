@@ -1,8 +1,8 @@
 from tkinter import *
 from tkinter import messagebox
-from Controller.ProgControl import ProgControl
-from UI.Schemawindow import Schemawindow
-from UI.DataWindow import Datawindow
+from datawiz.Controller.ProgControl import ProgControl
+from datawiz.UI.Schemawindow import Schemawindow
+from datawiz.UI.DataWindow import Datawindow
 
 class App(Frame):
     def __init__(self, root):

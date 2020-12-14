@@ -1,4 +1,4 @@
-from .Column import Column
+from datawiz.Model.DBHandler.Column import Column
 
 class Table:
     def __init__(self, name, columns=None):
