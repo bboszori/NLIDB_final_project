@@ -3,11 +3,8 @@ from queue import Queue
 from Model.NLHandler.ParseTree import ParseTree
 from Model.NLHandler.Node import Node
 from Model.NLHandler.Word import Word
-from Model.DBHandler.Schema import Schema
 from Model.NLHandler.SQLComponent import SQLComponent
 from operator import attrgetter
-import string
-import re
 from collections import Counter
 from math import sqrt
 

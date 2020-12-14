@@ -3,6 +3,27 @@ from mysql.connector import (connection)
 from mysql.connector import errorcode
 
 class Connection:
+    """
+        A class for database connection
+
+        Attributes
+        ----------
+        dbtype : string
+            'mysql'
+        dbName : string
+            the name of the database
+
+        Methods
+        -------
+        generateConfigdata(self, host, dbName, user, password):
+            Generating the configdata for db connection from database path, name, user and password
+
+        connect(self, host, dbName, user, password):
+            connect to the database
+
+        closeconnection(self):
+            close database connection
+        """
     def __init__(self, dbtype = 'mysql'):
         self.__dbtype = dbtype
         self.__dbName = ""

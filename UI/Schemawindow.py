@@ -1,6 +1,3 @@
-from Model.DBHandler.Schema import Schema
-from Model.DBHandler.Table import Table
-from Model.DBHandler.Column import Column
 from tkinter import *
 from tkinter.ttk import *
 

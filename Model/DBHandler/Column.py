@@ -10,13 +10,8 @@ class Column:
            datatype of column
        primary : boolean
            if key is primary
-       primary : boolean
-           if key is primary
-
-       Methods
-       -------
-       addChild(node):
-           Adding new child to the children list
+       foreign : boolean
+           if key is foreign key
        """
     def __init__(self, name, type, primary=False, foreign=False, sample=None, references = None):
         self.__columnname = name

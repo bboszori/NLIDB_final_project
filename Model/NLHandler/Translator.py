@@ -1,6 +1,5 @@
 from Model.DBHandler.Query import *
-from Model.NLHandler.Parser import Parser
-from Model.NLHandler.ParseTree import ParseTree
+
 
 class Translator:
     def __init__(self, parsetree, schema):

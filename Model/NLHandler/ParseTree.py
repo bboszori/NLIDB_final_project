@@ -1,6 +1,3 @@
-from Model.NLHandler.Node import Node
-from queue import Queue
-
 class ParseTree:
     def __init__(self):
         self.__root = None
